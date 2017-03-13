@@ -1,0 +1,16 @@
+{
+	"name": "egjs-persist",
+	"version": "2.0.0-beta",
+	"license": "MIT",
+	"keywords": [
+		"egjs",
+		"persist",
+		"javaScript"
+	],
+	"ignore": [
+		"**/.*",
+		"bower_components",
+		"node_modules"
+	],
+	"main": "dist/egjs-persist.js"
+}
