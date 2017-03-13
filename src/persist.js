@@ -1,30 +1,5 @@
-import {window} from "./browser";
 import StorageManager from "./storageManager";
-import {isBackForwardNavigated} from "./utils";
-import {CONST_PERSIST} from "./consts";
-
-const GLOBAL_KEY = `KEY${CONST_PERSIST}}`;
-const userAgent = window.navigator.userAgent;
-
-const isNeeded = (function() {
-	const isIOS = (new RegExp("/iPhone|iPad/", "i")).test(userAgent);
-	const isMacSafari = (new RegExp("Mac", "i")).test(userAgent) &&
-		!(new RegExp("Chrome", "i")).test(userAgent) &&
-		(new RegExp("Apple", "i")).test(userAgent);
-	const isAndroid = (new RegExp("/Android/", "i")).test(userAgent);
-	const isWebview = (new RegExp("/wv; /", "i")).test(userAgent);
-	const androidVersion = isAndroid ? parseFloat(new RegExp(
-		"(Android)\\s([\\d_\\.]+|\\d_0)", "i"
-	).exec(userAgent)[2]) : undefined;
-
-	return !(isIOS ||
-			isMacSafari ||
-			(isAndroid &&
-				(androidVersion <= 4.3 && isWebview || androidVersion < 3)));
-})();
-
-// in case of reload
-!isBackForwardNavigated() && StorageManager.reset();
+import {isNeeded} from "./utils";
 
 /**
 * Get or store the current state of the web page using JSON.
@@ -32,29 +7,31 @@ const isNeeded = (function() {
 * @method persist
 * @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
 * @param {Object} [state] The value to be stored in a given key <ko>키에 저장할 값</ko>
+* @example
+Persist(key);
+Persist(key, value);
 **/
-/*
-Persist(key)
-Persist(key, value)
-Persist.isNeeded();
-*/
-function persist(state, data) {
-	let key;
-
-	if (typeof state === "string") {
-		key = state;
-	} else {
-		key = GLOBAL_KEY;
-		data = arguments.length === 1 ? state : null;
+function persist(key, value) {
+	if (typeof key !== "string") {
+		console.warn("first param must be a string!");
+		return undefined;
 	}
 
-	if (data || arguments.length === 2) {
-		StorageManager.setStateByKey(key, data);
+	if (value || arguments.length === 2) {
+		StorageManager.setStateByKey(key, value);
 	}
 
 	return StorageManager.getStateByKey(key);
 }
 
+/**
+* Return whether you need "Persist" module by checking the bfCache support of the current browser
+* @ko 현재 브라우저의 bfCache 지원여부에 따라 persist 모듈의 필요여부를 반환한다.
+* @namespace
+* @property {function} isNeeded
+* @example
+Persist.isNeeded();
+*/
 persist.isNeeded = function() {
 	return isNeeded;
 };

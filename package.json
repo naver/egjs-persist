@@ -19,11 +19,12 @@
   "homepage": "https://github.com/naver/egjs/persist",
   "license": "MIT <https://naver.github.io/egjs/license.txt>",
   "dependencies": {
-    "eg.component": "github:naver/eg.component"
+    "eslint-config-naver": "0.0.20-beta"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-preset-es2015": "^6.22.0",
     "chai": "^3.5.0",
     "clean-webpack-plugin": "^0.1.15",

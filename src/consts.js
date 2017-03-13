@@ -1,5 +1,3 @@
-import {window} from "./browser";
+const CONST_PERSIST = "___persist___";
 
-CONST_PERSIST = "___persist___";
-
-export const {CONST_PERSIST}
+export default CONST_PERSIST;

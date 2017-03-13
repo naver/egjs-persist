@@ -12,14 +12,16 @@ module.exports = {
 		library:  ["eg", "persist" ],
 		libraryTarget: "umd",
 	},
-	externals: [{
-		"eg.component": {
-			commonjs: "eg.component",
-			commonjs2: "eg.component",
-			amd: "eg.component",
-			root: ["eg", "Component"]
-		}
-	}],
+	externals: [
+	// 	{
+	// 	"eg.component": {
+	// 		commonjs: "eg.component",
+	// 		commonjs2: "eg.component",
+	// 		amd: "eg.component",
+	// 		root: ["eg", "Component"]
+	// 	}
+	// }
+	],
 	devServer: {
 		publicPath: "/dist/"
 	},
@@ -39,6 +41,9 @@ module.exports = {
 								"modules": false
 							}
 						]
+					],
+					"plugins": [
+						"add-module-exports"
 					]
 				}
 			},
