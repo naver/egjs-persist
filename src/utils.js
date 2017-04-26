@@ -27,5 +27,5 @@ function isBackForwardNavigated() {
 
 export default {
 	isBackForwardNavigated,
-	isNeeded
+	isNeeded,
 };

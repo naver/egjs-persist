@@ -152,5 +152,5 @@ export default {
 	setStateByKey,
 	getStateByKey,
 	getStorageKey,
-	getStorage
+	getStorage,
 };
