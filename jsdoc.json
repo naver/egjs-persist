@@ -10,7 +10,8 @@
 	},
 	"opts": {
 		"template": "node_modules/egjs-jsdoc-template",
-		"destination": "./doc/"
+		"destination": "./doc/",
+		"expendsItemMembers": true
 	},
 	"plugins": [
 		"plugins/markdown",
@@ -42,7 +43,7 @@
 		},
 		"linenums": true,
 		"link": {
-			"canonical": "http://naver.github.io/egjs/latest/doc/jQuery.html#persist"
+			"canonical": "http://naver.github.io/egjs/latest/doc/"
 		}
 	},
 	"markdown": {

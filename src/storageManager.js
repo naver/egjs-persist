@@ -34,12 +34,11 @@ const storage = (function() {
 	return strg;
 })();
 
-// jscs:enable maximumLineLength
 function warnInvalidStorageValue() {
-	/* jshint ignore:start */
+	/* eslint-disable no-console */
 	console.warn("window.history or session/localStorage has no valid " +
 			"format data to be handled in persist.");
-	/* jshint ignore:end */
+	/* eslint-enable no-console */
 }
 
 function getStorageKey() {
@@ -118,9 +117,9 @@ function setState(state) {
 				location.href
 			);
 		} catch (e) {
-			/* jshint ignore:start */
+			/* eslint-disable no-console */
 			console.warn(e.message);
-			/* jshint ignore:end */
+			/* eslint-enable no-console */
 		}
 	}
 

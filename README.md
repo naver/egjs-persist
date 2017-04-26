@@ -14,7 +14,13 @@ The following table shows browsers supported by eg.Persist
 eg.Persist has no dependencies.
 
 ## How to Use
+```javascript
+// getter
+Persist(key);
 
+// setter
+Persist(key, value);
+```
 ## Bug Report
 
 If you find a bug, please report it to us using the [Issues](https://github.com/naver/egjs-persist/issues) page on GitHub.
