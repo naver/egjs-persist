@@ -1,4 +1,4 @@
-# eg.Persist
+# egjs-persist
 Provide cache interface to handle persisted data among history navigation.
 
 ## Documentation
@@ -11,15 +11,15 @@ The following table shows browsers supported by eg.Persist
 |9+|Latest|Latest|Latest|7+|2.2+(except 3.x)|
 
 ## Dependency
-eg.Persist has no dependencies.
+egjs-persist has no dependencies.
 
 ## How to Use
 ```javascript
 // getter
-Persist(key);
+eg.Persist(key);
 
 // setter
-Persist(key, value);
+eg.Persist(key, value);
 ```
 ## Bug Report
 
