@@ -231,16 +231,18 @@ module.exports = exports["default"];
 "use strict";
 
 
-var _persist = __webpack_require__(2);
+var _Persist = __webpack_require__(2);
 
-var _persist2 = _interopRequireDefault(_persist);
+var _Persist2 = _interopRequireDefault(_Persist);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = _persist2.default; /**
-                                    * Copyright (c) 2015 NAVER Corp.
-                                    * egjs-persist projects are licensed under the MIT license
-                                    */
+_Persist2.default.VERSION = "2.0.0-rc.1"; /**
+                                          * Copyright (c) 2015 NAVER Corp.
+                                          * egjs-persist projects are licensed under the MIT license
+                                          */
+
+module.exports = _Persist2.default;
 
 /***/ }),
 /* 5 */
