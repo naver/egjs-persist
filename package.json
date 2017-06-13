@@ -13,12 +13,15 @@
     "coverage": "karma start --coverage",
     "prepush": "npm run lint",
     "commitmsg": "node config/validate-commit-msg.js",
-    "start-demo": "npm run prebuild-demo && jekyll serve -s demo",
-    "prebuild-demo": "cpx 'doc/**/*' demo/doc/ --clean && cpx 'dist/**/*' demo/dist --clean",
-    "build-demo": "jekyll build -s demo"
+    "demo:start": "npm run demo:prebuild && jekyll serve -s demo",
+    "demo:build": "jekyll build -s demo",
+    "demo:prebuild": "cpx 'doc/**/*' demo/doc/ --clean && cpx 'dist/**/*' demo/dist --clean"
   },
   "author": {
     "name": "NAVER corp"
+  },
+  "namespace": {
+    "eg": "eg"
   },
   "homepage": "https://github.com/naver/egjs/persist",
   "license": "MIT <https://naver.github.io/egjs/license.txt>",
