@@ -1,4 +1,4 @@
-import Persist from "../../src/persist";
+import Persist from "../../src/Persist";
 
 describe("Persist", function() {
     describe("#persist", function() {

@@ -9,36 +9,24 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, "../dist"),
 		filename: "[name].js",
-		library:  ["eg", "Persist" ],
+		library: [pkg.namespace.eg, "Persist"],
 		libraryTarget: "umd",
 	},
-	externals: [
-		{
-		"@egjs/": {
-			commonjs: "@egjs/",
-			commonjs2: "@egjs/",
-			amd: "@egjs/",
-			root: ["eg", "Persist"]
-		}
-	}
-	],
 	devServer: {
 		publicPath: "/dist/"
 	},
 	devtool: "source-map",
 	module: {
-		rules: [
-			{
+		rules: [{
 				test: /(\.js)$/,
 				exclude: /(node_modules)/,
 				loader: "babel-loader",
 				query: {
-					"presets": [ 
+					"presets": [
 						[
 							"es2015",
 							{
-								"loose": true,
-								"modules": false
+								"loose": true
 							}
 						]
 					],
@@ -47,19 +35,18 @@ module.exports = {
 					]
 				}
 			},
-			{ 
+			{
 				test: /(\.js)$/,
 				loader: StringReplacePlugin.replace({
-					replacements: [
-						{
-							pattern: /#__VERSION__#/ig,
-							replacement: function (match, p1, offset, string) {
-								return pkg.version;
-							}
+					replacements: [{
+						pattern: /#__VERSION__#/ig,
+						replacement: function (match, p1, offset, string) {
+							return pkg.version;
 						}
-					]})
-            }
+					}]
+				})
+			}
 		]
 	},
-	plugins: [ new StringReplacePlugin() ]
+	plugins: [new StringReplacePlugin()]
 };

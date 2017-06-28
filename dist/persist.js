@@ -83,9 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+exports.__esModule = true;
 var win = typeof window !== "undefined" && window || {};
 
 exports.window = win;
@@ -107,9 +105,7 @@ var performance = exports.performance = win.performance;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
+exports.__esModule = true;
 
 var _browser = __webpack_require__(0);
 
@@ -144,9 +140,7 @@ module.exports = exports["default"];
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
+exports.__esModule = true;
 
 var _storageManager = __webpack_require__(5);
 
@@ -216,9 +210,7 @@ module.exports = exports["default"];
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+exports.__esModule = true;
 var CONST_PERSIST = "___persist___";
 
 exports.default = CONST_PERSIST;
@@ -231,16 +223,18 @@ module.exports = exports["default"];
 "use strict";
 
 
-var _persist = __webpack_require__(2);
+var _Persist = __webpack_require__(2);
 
-var _persist2 = _interopRequireDefault(_persist);
+var _Persist2 = _interopRequireDefault(_Persist);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-module.exports = _persist2.default; /**
-                                    * Copyright (c) 2015 NAVER Corp.
-                                    * egjs-persist projects are licensed under the MIT license
-                                    */
+_Persist2.default.VERSION = "2.0.0-rc.1"; /**
+                                          * Copyright (c) 2015 NAVER Corp.
+                                          * egjs-persist projects are licensed under the MIT license
+                                          */
+
+module.exports = _Persist2.default;
 
 /***/ }),
 /* 5 */
@@ -249,9 +243,7 @@ module.exports = _persist2.default; /**
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
+exports.__esModule = true;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
