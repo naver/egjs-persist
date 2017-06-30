@@ -1,6 +1,7 @@
 const win = (typeof window !== `undefined` && window) || {};
 
 export {win as window};
+export const console = win.console;
 export const document = win.document;
 export const history = win.history;
 export const localStorage = win.localStorage;

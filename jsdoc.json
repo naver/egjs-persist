@@ -1,21 +1,22 @@
 {
 	"tags": {
 		"allowUnknownTags" : true,
-		"dictionaries": ["jsdoc", "closure"]
+		"dictionaries": ["jsdoc","closure"]
 	},
 	"source": {
-		"include": ["src", "README.md"],
+		"include": ["src", "README.md"  ], 
 		"includePattern": ".+\\.js(doc|x)?$",
 		"excludePattern": "(^|\\/|\\\\)_"
 	},
 	"opts": {
 		"template": "node_modules/egjs-jsdoc-template",
 		"destination": "./doc/",
+		"ignores": ["eg.Component"],
 		"expendsItemMembers": true
 	},
 	"plugins": [
 		"plugins/markdown",
-		"node_modules/egjs-jsdoc-template/jsdoc-plugin/ko", 
+		"node_modules/egjs-jsdoc-template/jsdoc-plugin/ko",
 		"node_modules/egjs-jsdoc-template/jsdoc-plugin/group",
 		"node_modules/egjs-jsdoc-template/jsdoc-plugin/codepen",
 		"node_modules/egjs-jsdoc-template/jsdoc-plugin/support"
@@ -26,9 +27,9 @@
 		"default": {
 			"outputSourceFiles" : true
 		},
-		"applicationName": "egjs-persist",
+		"applicationName": "eg.Persist",
 		"disqus": "egjs",
-		"googleAnalytics": "",
+		"googleAnalytics": "UA-70842526-19",
 		"openGraph": {
 			"title": "",
 			"type": "website",
@@ -37,13 +38,13 @@
 			"url": ""
 		},
 		"meta": {
-			"title": "egjs-persist - API",
+			"title": "egjs::persist - API",
 			"description": "Provide cache interface to handle persisted data among history navigation.",
-			"keyword": "egjs, persist"
+			"keyword": ""
 		},
 		"linenums": true,
 		"link": {
-			"canonical": "http://naver.github.io/egjs/latest/doc/"
+			"canonical": "http://naver.github.io/egjs-persist/release/latest/doc/"
 		}
 	},
 	"markdown": {

@@ -1,8 +1,17 @@
+/*!
+ * Copyright (c) 2017 NAVER Corp.
+ * @egjs/persist project is licensed under the MIT license
+ * 
+ * @egjs/persist JavaScript library
+ * 
+ * 
+ * @version 2.0.0-rc2
+ */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define("Persist", [], factory);
 	else if(typeof exports === 'object')
 		exports["Persist"] = factory();
 	else
@@ -87,6 +96,7 @@ exports.__esModule = true;
 var win = typeof window !== "undefined" && window || {};
 
 exports.window = win;
+var console = exports.console = win.console;
 var document = exports.document = win.document;
 var history = exports.history = win.history;
 var localStorage = exports.localStorage = win.localStorage;
@@ -148,57 +158,118 @@ var _storageManager2 = _interopRequireDefault(_storageManager);
 
 var _utils = __webpack_require__(1);
 
+var _browser = __webpack_require__(0);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * @namespace eg
- */
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/**
-* Get or store the current state of the web page using JSON.
-* @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
-* @name eg#Persist
-* @alias eg.Persist
-* @method
-* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
-* @param {Object} [state] The value to be stored in a given key <ko>키에 저장할 값</ko>
-* @example
-```javascript
-eg.Persist(key);
-eg.Persist(key, value);
-```
-**/
-function Persist(key, value) {
-	if (typeof key !== "string") {
-		/* eslint-disable no-console */
-		console.warn("first param must be a string!");
-		/* eslint-enable no-console */
-		return undefined;
+function setRec(obj, path, value) {
+	var _obj = obj;
+
+	if (!_obj) {
+		_obj = isNaN(path[0]) ? {} : [];
 	}
 
-	if (value || arguments.length === 2) {
-		_storageManager2.default.setStateByKey(key, value);
+	var head = path.shift();
+
+	if (path.length === 0) {
+		if (_obj instanceof Array && isNaN(head)) {
+			_browser.console.warn("Don't use key string on array");
+		}
+		_obj[head] = value;
+		return _obj;
 	}
 
-	return _storageManager2.default.getStateByKey(key);
+	_obj[head] = setRec(_obj[head], path, value);
+	return _obj;
 }
 
 /**
-* Return whether you need "Persist" module by checking the bfCache support of the current browser
-* @ko 현재 브라우저의 bfCache 지원여부에 따라 persist 모듈의 필요여부를 반환한다.
-* @group eg.Persist
-* @name eg.Persist.isNeeded
-* @alias eg.Persist.isNeeded
-* @namespace
-* @property {function} isNeeded
-* @example
-eg.Persist.isNeeded();
-*/
-Persist.isNeeded = function () {
-	return _utils.isNeeded;
-};
+ * Get or store the current state of the web page using JSON.
+ * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
+ * @alias eg.Persist
+ *
+ * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
+ */
 
-Persist.VERSION = "2.0.0-rc.1";
+var Persist = function () {
+	/**
+ * Constructor
+ * @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+ **/
+	function Persist(key, value) {
+		_classCallCheck(this, Persist);
+
+		this.key = key;
+	}
+
+	/**
+  * Read value
+  * @param {String} path target path
+  * @return {String|Number|Boolean|Object|Array}
+  */
+
+
+	Persist.prototype.get = function get(path) {
+		// find path
+		var globalState = _storageManager2.default.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			return globalState;
+		}
+
+		var pathToken = path.split(".");
+		var currentItem = globalState;
+		var isTargetExist = true;
+
+		for (var i = 0; i < pathToken.length; i++) {
+			if (!currentItem) {
+				isTargetExist = false;
+				break;
+			}
+			currentItem = currentItem[pathToken[i]];
+		}
+		if (!isTargetExist || !currentItem) {
+			return null;
+		}
+		return currentItem;
+	};
+
+	/**
+  * Save value
+  * @param {String} path target path
+  * @param {String|Number|Boolean|Object|Array} value value to save
+  * @return {Persist}
+  */
+
+
+	Persist.prototype.set = function set(path, value) {
+		// find path
+		var globalState = _storageManager2.default.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			_storageManager2.default.setStateByKey(this.key, value);
+		} else {
+			_storageManager2.default.setStateByKey(this.key, setRec(globalState, path.split("."), value));
+		}
+
+		return this;
+	};
+
+	/**
+  * @static
+  * Return whether you need "Persist" module by checking the bfCache support of the current browser
+  * @return {Boolean}
+  */
+
+
+	Persist.isNeeded = function isNeeded() {
+		return _utils.isNeeded;
+	};
+
+	return Persist;
+}();
 
 exports.default = Persist;
 module.exports = exports["default"];
@@ -229,10 +300,10 @@ var _Persist2 = _interopRequireDefault(_Persist);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Persist2.default.VERSION = "2.0.0-rc.1"; /**
-                                          * Copyright (c) 2015 NAVER Corp.
-                                          * egjs-persist projects are licensed under the MIT license
-                                          */
+_Persist2.default.VERSION = "2.0.0-rc2"; /**
+                                         * Copyright (c) 2015 NAVER Corp.
+                                         * egjs-persist projects are licensed under the MIT license
+                                         */
 
 module.exports = _Persist2.default;
 
@@ -310,7 +381,18 @@ function getStorage() {
  */
 function getState() {
 	var state = void 0;
-	var stateStr = storage ? storage.getItem(_browser.location.href + _consts2.default) : _browser.history.state;
+	var PERSIST_KEY = _browser.location.href + _consts2.default;
+	var stateStr = void 0;
+
+	if (storage) {
+		stateStr = storage.getItem(PERSIST_KEY);
+	} else if (_browser.history.state) {
+		if (_typeof(_browser.history.state) !== "object") {
+			stateStr = _browser.history.state[PERSIST_KEY];
+		} else {
+			warnInvalidStorageValue();
+		}
+	}
 
 	// the storage is clean
 	if (stateStr === null) {
@@ -356,19 +438,26 @@ function getStateByKey(key) {
  * Set state value
  */
 function setState(state) {
+	var PERSIST_KEY = _browser.location.href + _consts2.default;
+
 	if (storage) {
 		if (state) {
-			storage.setItem(_browser.location.href + _consts2.default, _browser.JSON.stringify(state));
+			storage.setItem(PERSIST_KEY, _browser.JSON.stringify(state));
 		} else {
-			storage.removeItem(_browser.location.href + _consts2.default);
+			storage.removeItem(PERSIST_KEY);
 		}
 	} else {
 		try {
-			_browser.history.replaceState(state === null ? null : _browser.JSON.stringify(state), document.title, _browser.location.href);
+			var historyState = _browser.history.state;
+
+			if ((typeof historyState === "undefined" ? "undefined" : _typeof(historyState)) === "object") {
+				historyState[PERSIST_KEY] = _browser.JSON.stringify(state);
+				_browser.history.replaceState(historyState, document.title, _browser.location.href);
+			} else {
+				console.warn("To use a history object, it must be an object that is not a primitive type.");
+			}
 		} catch (e) {
-			/* eslint-disable no-console */
 			console.warn(e.message);
-			/* eslint-enable no-console */
 		}
 	}
 
@@ -408,4 +497,3 @@ module.exports = exports["default"];
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=persist.js.map

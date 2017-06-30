@@ -6,40 +6,26 @@
 5. Click refresh button on mobile phone.
 6. **Check loaded comments are gone.**
 
-<div class="deviceContainer persistDemo">
-  <div class="screen">
-  <div class="addressbar">
-    <div class="backBtn button"></div>
-    <div class="forwardBtn button"></div>
-    <div class="refreshBtn button"></div>
-    <div class="label"></div>
-    <div class="progress-indicator"></div>
-  </div>
-  <div class="viewport">
-     <iframe src="persisted.html" width="288" height="462">
-       </iframe>
-  </div>
-  </div>
-</div>
+{% include_relative assets/html/demo.html %}
 
+```js
 
-```javascript
+const persist = new eg.Persist("commentModule");
+
 $(".loadCmtBtn").on("click", function() {
 	// Make change to the component. (append comments) 
 	$.get("/api/123/nextcomment", function(commentHtml) {
-		$(".commentContainer").append( commentHtml );		
+		$(".commentContainer").append(commentHtml);		
 
 		// Save snapshot of the component when there is a change
 		var snapshot = $(".commentContainer").html();
-		Persist("commentModule", {
-			commentsHTML: snapshot
-		});
+		persist.set("commentsHTML", snapshot);
 	});
 });
 	
 // Restore state when initiate component
-if(Persist("commentModule")) {
-	var commentsHTML = Persist("commentModule"). commentsHTML;
+if(!persist.get("") === null) {
+	var commentsHTML = persist.get("commentsHTML");
 	$(".commentContainer").html(commentsHTML);
 }
 ```

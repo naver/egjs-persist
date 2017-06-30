@@ -54,8 +54,18 @@ function getStorage() {
  */
 function getState() {
 	let state;
-	const stateStr = storage ?
-		storage.getItem(location.href + CONST_PERSIST) : history.state;
+	const PERSIST_KEY = location.href + CONST_PERSIST;
+	let stateStr;
+
+	if (storage) {
+		stateStr = storage.getItem(PERSIST_KEY);
+	} else if (history.state) {
+		if (typeof history.state !== "object") {
+			stateStr = history.state[PERSIST_KEY];
+		} else {
+			warnInvalidStorageValue();
+		}
+	}
 
 	// the storage is clean
 	if (stateStr === null) {
@@ -102,24 +112,31 @@ function getStateByKey(key) {
  * Set state value
  */
 function setState(state) {
+	const PERSIST_KEY = location.href + CONST_PERSIST;
+
 	if (storage) {
 		if (state) {
 			storage.setItem(
-				location.href + CONST_PERSIST, JSON.stringify(state));
+				PERSIST_KEY, JSON.stringify(state));
 		} else {
-			storage.removeItem(location.href + CONST_PERSIST);
+			storage.removeItem(PERSIST_KEY);
 		}
 	} else {
 		try {
-			history.replaceState(
-				state === null ? null : JSON.stringify(state),
-				document.title,
-				location.href
-			);
+			const historyState = history.state;
+
+			if (typeof historyState === "object") {
+				historyState[PERSIST_KEY] = JSON.stringify(state);
+				history.replaceState(
+					historyState,
+					document.title,
+					location.href
+				);
+			} else {
+				console.warn("To use a history object, it must be an object that is not a primitive type.");
+			}
 		} catch (e) {
-			/* eslint-disable no-console */
 			console.warn(e.message);
-			/* eslint-enable no-console */
 		}
 	}
 
