@@ -58,52 +58,13 @@
     </div>
     <ul class="list">
     
-    
-        <!-- Grouping Version -->
-        <ul class="group">
-        <span>eg.Persist</span>
+        <!-- Non Grouping Version -->
         
             
 
-<li class="item" data-name="eg.Persist.isNeeded">
+<li class="item" data-name="eg.Persist">
     <span class="title">
-        <a href="eg.Persist.isNeeded.html">eg.Persist.isNeeded</a>
-        
-        <span class="static">static</span>
-        
-    </span>
-    <ul class="members itemMembers expends">
-    
-    </ul>
-    <ul class="typedefs itemMembers expends">
-    
-    </ul>
-    <ul class="methods itemMembers expends">
-    
-    </ul>
-    <ul class="events itemMembers expends">
-    
-    </ul>
-
-    
-    <span class="title" style="margin-top:10px"><a href="index.html">readme</a></span>
-
-</li>
-
-        
-        </ul>
-    
-        <!-- Grouping Version -->
-        <ul class="group">
-        <span>Global</span>
-        
-            
-
-<li class="item" data-name="eg">
-    <span class="title">
-        <a href="eg.html">eg</a>
-        
-        <span class="static">static</span>
+        <a href="eg.Persist.html">eg.Persist</a>
         
     </span>
     <ul class="members itemMembers expends">
@@ -116,7 +77,11 @@
     
     <span class="subtitle">Methods</span>
     
-        <li data-name="eg#Persist"><a href="eg.html#Persist">Persist</a></li>
+        <li data-name="eg.Persist.isNeeded"><a href="eg.Persist.html#.isNeeded">isNeeded</a></li>
+    
+        <li data-name="eg.Persist#get"><a href="eg.Persist.html#get">get</a></li>
+    
+        <li data-name="eg.Persist#set"><a href="eg.Persist.html#set">set</a></li>
     
     </ul>
     <ul class="events itemMembers expends">
@@ -129,7 +94,6 @@
 </li>
 
         
-        </ul>
     
     </ul>
 </div>
@@ -168,99 +132,82 @@ function setRec(obj, path, value) {
 }
 
 /**
- * @namespace eg
+ * Get or store the current state of the web page using JSON.
+ * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
+ * @alias eg.Persist
+ *
+ * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
  */
-
-/**
-* Get or store the current state of the web page using JSON.
-* @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
-* @name eg#Persist
-* @alias eg.Persist
-* @method
-* @param {String} key The key of the state information to be stored &lt;ko>저장할 상태 정보의 키&lt;/ko>
-* @param {Object} [state] The value to be stored in a given key &lt;ko>키에 저장할 값&lt;/ko>
-* @example
-```javascript
-eg.Persist(key);
-eg.Persist(key, value);
-```
-**/
-function Persist(key, value) {
-	// when called as plain method
-	if (!(this instanceof Persist)) {
-		if (typeof key !== "string") {
-			/* eslint-disable no-console */
-			console.warn("first param must be a string!");
-			/* eslint-enable no-console */
-			return undefined;
-		}
-
-		if (value || arguments.length === 2) {
-			StorageManager.setStateByKey(key, value);
-		}
-
-		return StorageManager.getStateByKey(key);
+class Persist {
+	/**
+	* Constructor
+	* @param {String} key The key of the state information to be stored &lt;ko>저장할 상태 정보의 키&lt;/ko>
+	**/
+	constructor(key, value) {
+		this.key = key;
 	}
 
-	// when called as constructer
-	this.key = key;
+	/**
+	 * Read value
+	 * @param {String} path target path
+	 * @return {String|Number|Boolean|Object|Array}
+	 */
+	get(path) {
+		// find path
+		const globalState =	StorageManager.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			return globalState;
+		}
+
+		const pathToken = path.split(".");
+		let currentItem = globalState;
+		let isTargetExist = true;
+
+		for (let i = 0; i &lt; pathToken.length; i++) {
+			if (!currentItem) {
+				isTargetExist = false;
+				break;
+			}
+			currentItem = currentItem[pathToken[i]];
+		}
+		if (!isTargetExist || !currentItem) {
+			return null;
+		}
+		return currentItem;
+	}
+
+	/**
+	 * Save value
+	 * @param {String} path target path
+	 * @param {String|Number|Boolean|Object|Array} value value to save
+	 * @return {Persist}
+	 */
+	set(path, value) {
+		// find path
+		const globalState =	StorageManager.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			StorageManager.setStateByKey(this.key, value);
+		} else {
+			StorageManager.setStateByKey(
+				this.key,
+				setRec(globalState, path.split("."), value)
+			);
+		}
+
+		return this;
+	}
+
+	/**
+	 * @static
+	 * Return whether you need "Persist" module by checking the bfCache support of the current browser
+	 * @return {Boolean}
+	 */
+	static isNeeded() {
+		return isNeeded;
+	}
 }
-
-Persist.prototype.get = function(path) {
-	// find path
-	const globalState =	StorageManager.getStateByKey(this.key);
-
-	if (path.length === 0) {
-		return globalState;
-	}
-
-	const pathToken = path.split(".");
-	let currentItem = globalState;
-	let isTargetExist = true;
-
-	for (let i = 0; i &lt; pathToken.length; i++) {
-		if (!currentItem) {
-			isTargetExist = false;
-			break;
-		}
-		currentItem = currentItem[pathToken[i]];
-	}
-	if (!isTargetExist || !currentItem) {
-		return null;
-	}
-	return currentItem;
-};
-
-Persist.prototype.set = function(path, value) {
-	// find path
-	const globalState =	StorageManager.getStateByKey(this.key);
-
-	if (path.length === 0) {
-		StorageManager.setStateByKey(this.key, value);
-	} else {
-		StorageManager.setStateByKey(
-			this.key,
-			setRec(globalState, path.split("."), value)
-		);
-	}
-
-	return this;
-};
-
-/**
-* Return whether you need "Persist" module by checking the bfCache support of the current browser
-* @ko 현재 브라우저의 bfCache 지원여부에 따라 persist 모듈의 필요여부를 반환한다.
-* @group eg.Persist
-* @name eg.Persist.isNeeded
-* @alias eg.Persist.isNeeded
-* @namespace
-* @property {function} isNeeded
-* @example
-eg.Persist.isNeeded();
-*/
-Persist.isNeeded = function() {
-	return isNeeded;
-};
 
 export default Persist;
 </code></pre>
@@ -281,7 +228,7 @@ export default Persist;
         
 
         <footer>
-            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Jun 30 2017 17:06:26 GMT+0900 (KST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Jun 30 2017 17:36:02 GMT+0900 (KST)
         </footer>
     </div>
 </div>

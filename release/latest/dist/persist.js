@@ -162,6 +162,8 @@ var _browser = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function setRec(obj, path, value) {
 	var _obj = obj;
 
@@ -184,96 +186,90 @@ function setRec(obj, path, value) {
 }
 
 /**
- * @namespace eg
+ * Get or store the current state of the web page using JSON.
+ * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
+ * @alias eg.Persist
+ *
+ * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
  */
 
-/**
-* Get or store the current state of the web page using JSON.
-* @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
-* @name eg#Persist
-* @alias eg.Persist
-* @method
-* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
-* @param {Object} [state] The value to be stored in a given key <ko>키에 저장할 값</ko>
-* @example
-```javascript
-eg.Persist(key);
-eg.Persist(key, value);
-```
-**/
-function Persist(key, value) {
-	// when called as plain method
-	if (!(this instanceof Persist)) {
-		if (typeof key !== "string") {
-			/* eslint-disable no-console */
-			_browser.console.warn("first param must be a string!");
-			/* eslint-enable no-console */
-			return undefined;
+var Persist = function () {
+	/**
+ * Constructor
+ * @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+ **/
+	function Persist(key, value) {
+		_classCallCheck(this, Persist);
+
+		this.key = key;
+	}
+
+	/**
+  * Read value
+  * @param {String} path target path
+  * @return {String|Number|Boolean|Object|Array}
+  */
+
+
+	Persist.prototype.get = function get(path) {
+		// find path
+		var globalState = _storageManager2.default.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			return globalState;
 		}
 
-		if (value || arguments.length === 2) {
-			_storageManager2.default.setStateByKey(key, value);
+		var pathToken = path.split(".");
+		var currentItem = globalState;
+		var isTargetExist = true;
+
+		for (var i = 0; i < pathToken.length; i++) {
+			if (!currentItem) {
+				isTargetExist = false;
+				break;
+			}
+			currentItem = currentItem[pathToken[i]];
+		}
+		if (!isTargetExist || !currentItem) {
+			return null;
+		}
+		return currentItem;
+	};
+
+	/**
+  * Save value
+  * @param {String} path target path
+  * @param {String|Number|Boolean|Object|Array} value value to save
+  * @return {Persist}
+  */
+
+
+	Persist.prototype.set = function set(path, value) {
+		// find path
+		var globalState = _storageManager2.default.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			_storageManager2.default.setStateByKey(this.key, value);
+		} else {
+			_storageManager2.default.setStateByKey(this.key, setRec(globalState, path.split("."), value));
 		}
 
-		return _storageManager2.default.getStateByKey(key);
-	}
+		return this;
+	};
 
-	// when called as constructer
-	this.key = key;
-}
+	/**
+  * @static
+  * Return whether you need "Persist" module by checking the bfCache support of the current browser
+  * @return {Boolean}
+  */
 
-Persist.prototype.get = function (path) {
-	// find path
-	var globalState = _storageManager2.default.getStateByKey(this.key);
 
-	if (path.length === 0) {
-		return globalState;
-	}
+	Persist.isNeeded = function isNeeded() {
+		return _utils.isNeeded;
+	};
 
-	var pathToken = path.split(".");
-	var currentItem = globalState;
-	var isTargetExist = true;
-
-	for (var i = 0; i < pathToken.length; i++) {
-		if (!currentItem) {
-			isTargetExist = false;
-			break;
-		}
-		currentItem = currentItem[pathToken[i]];
-	}
-	if (!isTargetExist || !currentItem) {
-		return null;
-	}
-	return currentItem;
-};
-
-Persist.prototype.set = function (path, value) {
-	// find path
-	var globalState = _storageManager2.default.getStateByKey(this.key);
-
-	if (path.length === 0) {
-		_storageManager2.default.setStateByKey(this.key, value);
-	} else {
-		_storageManager2.default.setStateByKey(this.key, setRec(globalState, path.split("."), value));
-	}
-
-	return this;
-};
-
-/**
-* Return whether you need "Persist" module by checking the bfCache support of the current browser
-* @ko 현재 브라우저의 bfCache 지원여부에 따라 persist 모듈의 필요여부를 반환한다.
-* @group eg.Persist
-* @name eg.Persist.isNeeded
-* @alias eg.Persist.isNeeded
-* @namespace
-* @property {function} isNeeded
-* @example
-eg.Persist.isNeeded();
-*/
-Persist.isNeeded = function () {
-	return _utils.isNeeded;
-};
+	return Persist;
+}();
 
 exports.default = Persist;
 module.exports = exports["default"];
