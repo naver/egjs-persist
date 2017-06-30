@@ -2,72 +2,80 @@ import Persist from "../../src/Persist";
 import PersistInjector from "inject-loader!../../src/Persist";
 
 describe("Persist", function() {
-    describe("#persist", function() {
+    describe("Preserve types", function() {
         it("save number, get number", () => {
             // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null);            
             const data = 100;
 
             // When
-            Persist("TESTKEY", data);
+            persist.set("", data);
 
             // Then
-            expect(Persist("TESTKEY")).to.equal(data);
+            expect(persist.get("")).to.equal(data);
         });
 
         it("save string data, get string data", () => {
             // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null);  
             const data = JSON.stringify({
                 "scrollTop": 100
             });
 
             // When
-            Persist("TESTKEY", data);
+            persist.set("", data);
 
             // Then
-            expect(Persist("TESTKEY")).to.equal(data);
+            expect(persist.get("")).to.equal(data);
         });
 
         it("save object data, get object data", () => {
             // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null); 
             const data = {
                 "scrollTop": 100
             };
 
             // When
-            Persist("TESTKEY", data);
+            persist.set("", data);
 
             // Then
-            expect(Persist("TESTKEY")).to.deep.equal({
-                "scrollTop": 100
-            });
+            expect(persist.get("")).to.deep.equal(data);
         });
 
         it("remove state data with undefined and key", () => {
             // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null); 
             const data = {
                 "scrollTop": 100
             };
-            Persist("TESTKEY", data);
+            persist.set("", data);
 
             // When
-            Persist("TESTKEY", undefined);
+            persist.set("", undefined);
 
             // Then
-            expect(Persist("TESTKEY")).to.equal(null);
+            expect(persist.get("")).to.equal(null);
         });
 
         it("remove state data with null and key", () => {
             // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null); 
             const data = {
                 "scrollTop": 100
             };
-            Persist("TESTKEY", data);
+            persist.set("", data);
 
             // When
-            Persist("TESTKEY", null);
+            persist.set("", null);
 
             // Then
-            expect(Persist("TESTKEY")).to.equal(null);
+            expect(persist.get("")).to.equal(null);
         });
     });
 
