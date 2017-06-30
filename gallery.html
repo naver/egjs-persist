@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>egjs-persist</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" href="./common/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./common/css/page.css">
+    <link rel="stylesheet" href="./common/css/monokai.css">
+    <script src="./common/js/jquery-2.2.4.js"></script>
+    <script src="./common/js/bootstrap.min.js"></script>
+</head>
+
+	<link rel="stylesheet" href="assets/css/demo.css">
+
+
+	<script src="release/latest/dist/persist.min.js"></script>
+
+<script>
+	window.LIBLINK = [];
+	
+	window.LIBLINK.push(window.location.href.replace("/index.html", "/")
+            .replace("/gallery.html", "/") + "release/latest/dist/persist.min.js");
+	
+</script>
+<body>
+<link rel="stylesheet" href="./common/css/gallery.css">
+<div>
+	<section id="docs" class="docs section demos">
+		<div class="container">
+			<div class="docs-inner">
+				
+				<h2 id="persisted-comments-loaded-with-ajax">Persisted comments loaded with ajax</h2>
+<ol>
+  <li>Click “load comments” button and load more comments.</li>
+  <li>Click link to the end page.</li>
+  <li>Go back with browser back button on mobile phone.</li>
+  <li><strong>Check loaded comments are still there.</strong></li>
+  <li>Click refresh button on mobile phone.</li>
+  <li><strong>Check loaded comments are gone.</strong></li>
+</ol>
+
+<!--<div class="demobox" codepen="demo">-->
+<div class="demobox">
+    <div class="deviceContainer persistDemo">
+    <div class="screen">
+    <div class="addressbar">
+        <div class="backBtn button"></div>
+        <div class="forwardBtn button"></div>
+        <div class="refreshBtn button"></div>
+        <div class="label"></div>
+        <div class="progress-indicator"></div>
+    </div>
+    <div class="viewport">
+        <iframe src="persisted.html" width="288" height="462">
+        </iframe>
+    </div>
+    </div>
+    </div>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>
+<span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"commentModule"</span><span class="p">);</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="s2">".loadCmtBtn"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// Make change to the component. (append comments) </span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"/api/123/nextcomment"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
+
+		<span class="c1">// Save snapshot of the component when there is a change</span>
+		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+		<span class="nx">persist</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
+	<span class="p">});</span>
+<span class="p">});</span>
+	
+<span class="c1">// Restore state when initiate component</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+			</div>
+		</div>
+	</section>
+</div>
+
+	<script src="assets/js/demo.js"></script>
+
+<script>
+$("h3[id]").append(function() {
+	return "<a href='./index.html#" + this.id + "' target='_blank' class='more'>" +
+		'<span class="moreBtn">more</span></a>';
+});
+</script>
+</body>
+</html>

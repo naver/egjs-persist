@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>egjs-persist</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" href="./common/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./common/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./common/css/page.css">
+    <link rel="stylesheet" href="./common/css/monokai.css">
+    <script src="./common/js/jquery-2.2.4.js"></script>
+    <script src="./common/js/bootstrap.min.js"></script>
+</head>
+
+	<link rel="stylesheet" href="assets/css/demo.css">
+
+
+	<script src="release/latest/dist/persist.min.js"></script>
+
+<script>
+	window.LIBLINK = [];
+	
+	window.LIBLINK.push(window.location.href.replace("/index.html", "/")
+            .replace("/gallery.html", "/") + "release/latest/dist/persist.min.js");
+	
+</script>
+<body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+    <!-- ******HEADER****** -->
+    <header id="header" class="header">
+        <div class="container">
+            <a href="//naver.github.io/egjs">
+                <h1 class="logo pull-left"></h1>
+            </a><!--//logo-->
+            <nav id="main-nav" class="main-nav navbar-right" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="true">
+                        <img src="common/image/logo.svg">
+                    </button>
+                </div><!--//navbar-header-->
+                 <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a class="page-scroll" href="//github.com/naver/egjs-persist" target="_blank">Github</a>
+                        </li>
+                        <li>
+                            <a class="page-scroll" href="release/latest/doc" target="_blank">API Document</a>
+                        </li>
+                        <li>
+                            <a class="page-scroll" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0-rc2</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav><!--//main-nav-->
+        </div>
+    </header><!--//header-->
+
+<section id="promo" class="promo section offset-header" style="padding-top:90px">
+    <div class="container text-center">
+        <h2 class="title"><span class="highlight">Persist</span></h2>
+        <p class="intro">Provide cache interface to handle persisted data among history navigation.</p>
+        <div class="btns">
+            <!--<a class="btn btn-cta-primary" href="release/latest/doc" target="_blank">Github</a>-->
+            <a class="btn btn-cta-primary" href="release/latest/doc" target="_blank">API Document</a>
+            <a class="btn btn-cta-primary" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0-rc2</a>
+        </div>
+    </div>
+    <div class="social-media">
+        <div class="social-media-inner container text-center">
+            <ul class="list-inline">
+                <li class="facebook-like">
+                     <div class="fb-like" data-href="//naver.github.io/egjs-persist/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
+                </li>
+                <li class="github-fork"><iframe src="//ghbtns.com/github-btn.html?user=naver&repo=egjs-persist&type=fork" allowtransparency="true" frameborder="0" scrolling="0" width="53" height="20"></iframe></li>
+                <li class="github-star"><iframe src="//ghbtns.com/github-btn.html?user=naver&repo=egjs-persist&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100" height="20"></iframe></li>
+            </ul>
+        </div>
+    </div>
+</section>
+<div>
+	<section id="about" class="docs section">
+		<div class="container">
+			<div class="docs-inner">
+				<h2 class="title text-center">Get Started</h2>
+				
+				<h3 id="browser-support">Browser support</h3>
+<p>IE 9+, latest of Chrome/FF/Safari, iOS 7+ and Android 2.3+ (except 3.x)</p>
+
+<h3 id="feature">Feature</h3>
+<ul>
+  <li>Providing key-value storage interface.</li>
+  <li>Data is persistent only during back-forward navigation.</li>
+  <li>Refreshing browser erases the data.</li>
+  <li>Can create an instance for each UI component using key string.</li>
+  <li>Can use dot notation path.</li>
+</ul>
+
+<h3 id="quick-steps-to-use">Quick steps to use</h3>
+
+<h4 id="install">Install</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code>npm install --save @egjs/persist
+</code></pre>
+</div>
+
+<h4 id="or-use-cdn">or use CDN</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//naver.github.io/egjs-persist/release/latest/dist/persist.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+</code></pre>
+</div>
+
+<h3 id="initialize">Initialize</h3>
+
+<h4 id="es5">ES5</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<h4 id="es6">ES6+</h4>
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+</code></pre>
+</div>
+
+<h3 id="usage">Usage</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+
+<span class="c1">// Overwrite global object</span>
+<span class="kd">var</span> <span class="nx">snapshotObject</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="na">list</span><span class="p">:</span> <span class="p">[{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"foo"</span><span class="p">},</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">}]</span>
+    <span class="na">index</span><span class="p">:</span> <span class="mi">0</span>
+<span class="p">};</span>
+
+<span class="nx">persist</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="nx">snapshotObject</span><span class="p">);</span>
+
+<span class="c1">// Get global object</span>
+<span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="cm">/* 
+{ 
+    list: [{name: "foo"}, {name: "bar"}]
+    index: 0
+} 
+*/</span>
+
+<span class="c1">// Get with property name and index</span>
+<span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"index"</span><span class="p">);</span>
+<span class="c1">// =&gt; 0</span>
+
+<span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"list.0"</span><span class="p">);</span>
+<span class="c1">// =&gt; {name: "foo"}</span>
+
+<span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"list.0.name"</span><span class="p">);</span>
+<span class="c1">// =&gt; "foo"</span>
+
+<span class="c1">// Set with property name and index</span>
+<span class="nx">persist</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"list.2"</span><span class="p">,</span> <span class="s2">"foo"</span><span class="p">);</span>
+<span class="cm">/* =&gt; this
+{ 
+    list: [{name: "foo"}, {name: "bar"}, "foo"]
+    index: 0
+} 
+*/</span>
+
+<span class="c1">// Chaining with set method </span>
+<span class="nx">persist</span>
+    <span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"isActive"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"index"</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"list"</span><span class="p">);</span>
+<span class="c1">//=&gt; [{name: "foo"}, {name: "bar"}, "foo"] </span>
+</code></pre>
+</div>
+
+			</div>
+		</div>
+	</section>
+	<section id="docs" class="docs section demos">
+		<div class="container">
+			<div class="docs-inner">
+				<h2 class="title text-center">Demos</h2>
+				
+				<h2 id="persisted-comments-loaded-with-ajax">Persisted comments loaded with ajax</h2>
+<ol>
+  <li>Click “load comments” button and load more comments.</li>
+  <li>Click link to the end page.</li>
+  <li>Go back with browser back button on mobile phone.</li>
+  <li><strong>Check loaded comments are still there.</strong></li>
+  <li>Click refresh button on mobile phone.</li>
+  <li><strong>Check loaded comments are gone.</strong></li>
+</ol>
+
+<!--<div class="demobox" codepen="demo">-->
+<div class="demobox">
+    <div class="deviceContainer persistDemo">
+    <div class="screen">
+    <div class="addressbar">
+        <div class="backBtn button"></div>
+        <div class="forwardBtn button"></div>
+        <div class="refreshBtn button"></div>
+        <div class="label"></div>
+        <div class="progress-indicator"></div>
+    </div>
+    <div class="viewport">
+        <iframe src="persisted.html" width="288" height="462">
+        </iframe>
+    </div>
+    </div>
+    </div>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>
+<span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"commentModule"</span><span class="p">);</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="s2">".loadCmtBtn"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// Make change to the component. (append comments) </span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"/api/123/nextcomment"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
+
+		<span class="c1">// Save snapshot of the component when there is a change</span>
+		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+		<span class="nx">persist</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
+	<span class="p">});</span>
+<span class="p">});</span>
+	
+<span class="c1">// Restore state when initiate component</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+			</div>
+		</div>
+	</section>
+</div>
+    <!-- ******FOOTER****** -->
+    <footer class="footer">
+        <div class="container text-center">
+            <small class="copyright"><img style="width:40px;" src="common/image/type_white.svg"/> by <a href="//navercorp.com/" target="_blank">© NAVER Corp.</a></small>
+        </div><!--//container-->
+    </footer><!--//footer-->
+
+    <!-- Javascript -->
+    <script type="text/javascript" src="./common/js/app.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-70842526-19', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+
+	<script src="assets/js/demo.js"></script>
+
+</body>
+</html>
