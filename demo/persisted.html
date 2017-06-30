@@ -64,8 +64,7 @@
 		}
 		</style>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-		<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/egjs/1.2.0/pkgd/eg.pkgd.min.js"></script>-->
-    <script src="../dist/persist.min.js"></script>
+    <script src="../release/latest/dist/persist.min.js"></script>
 	</head>
 	<body>
 		<div class="content">
@@ -85,21 +84,24 @@ when refresh this page.</p>
 		<button class="loadCmtBtn">Load more comments</button>
 		<a class="link" href="end-page.html">Or goto the end page.</a>
 		<script>
+			var persist = new eg.Persist("commentModule");
+
 			$(".loadCmtBtn").on("click", function() {
 				// Make change to the component. (append comments) 
 				$(".commentContainer").append("<div class=\"content comment\"><div class=\"avatar\" style=\"background-image: url(./assets/img/user.png)\"></div><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt</p></div>");
-				
+
 				// Save snapshot of the component when there is a change
 				var snapshot = $(".commentContainer").html();
-				eg.Persist("commentModule",  {
-					commentsHtml: snapshot
-				});
+				persist.set("commentsHTML", snapshot);
 			});
-			
-			// Restore state
-			if(eg.Persist("commentModule")) {
-				$(".commentContainer").html(eg.Persist("commentModule").commentsHtml);			
+				
+			// Restore state when initiate component
+			if(persist.get("") !== null) {
+				var commentsHTML = persist.get("commentsHTML");
+
+				$(".commentContainer").html(commentsHTML);
 			}
+
 		</script>
 	</body>
 </html>
