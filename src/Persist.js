@@ -2,6 +2,27 @@ import StorageManager from "./storageManager";
 import {isNeeded} from "./utils";
 import {console} from "./browser";
 
+function setRec(obj, path, value) {
+	let _obj = obj;
+
+	if (!_obj) {
+		_obj = isNaN(path[0]) ? {} : [];
+	}
+
+	const head = path.shift();
+
+	if (path.length === 0) {
+		if (_obj instanceof Array && isNaN(head)) {
+			console.warn("Don't use key string on array");
+		}
+		_obj[head] = value;
+		return _obj;
+	}
+
+	_obj[head] = setRec(_obj[head], path, value);
+	return _obj;
+}
+
 /**
  * @namespace eg
  */
@@ -81,27 +102,6 @@ Persist.prototype.set = function(path, value) {
 
 	return this;
 };
-
-function setRec(obj, path, value) {
-	let _obj = obj;
-
-	if (!_obj) {
-		_obj = isNaN(path[0]) ? {} : [];
-	}
-
-	const head = path.shift();
-
-	if (path.length === 0) {
-		if (_obj instanceof Array && isNaN(head)) {
-			console.warn("Don't use key string on array");
-		}
-		_obj[head] = value;
-		return _obj;
-	}
-
-	_obj[head] = setRec(_obj[head], path, value);
-	return _obj;
-}
 
 /**
 * Return whether you need "Persist" module by checking the bfCache support of the current browser

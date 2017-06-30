@@ -124,6 +124,7 @@ function setState(state) {
 	} else {
 		try {
 			const historyState = history.state;
+
 			if (typeof historyState === "object") {
 				historyState[PERSIST_KEY] = JSON.stringify(state);
 				history.replaceState(
@@ -132,14 +133,10 @@ function setState(state) {
 					location.href
 				);
 			} else {
-			/* eslint-disable no-console */
-			console.warn(e.message);
-			/* eslint-enable no-console */				
+				console.warn("To use a history object, it must be an object that is not a primitive type.");
 			}
 		} catch (e) {
-			/* eslint-disable no-console */
 			console.warn(e.message);
-			/* eslint-enable no-console */
 		}
 	}
 
