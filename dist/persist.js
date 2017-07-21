@@ -137,7 +137,7 @@ function isBackForwardNavigated() {
 	return _browser.performance.navigation.type === TYPE_BACK_FORWARD;
 }
 
-exports.default = {
+exports["default"] = {
 	isBackForwardNavigated: isBackForwardNavigated,
 	isNeeded: isNeeded
 };
@@ -160,7 +160,7 @@ var _utils = __webpack_require__(1);
 
 var _browser = __webpack_require__(0);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -213,7 +213,7 @@ var Persist = function () {
 
 	Persist.prototype.get = function get(path) {
 		// find path
-		var globalState = _storageManager2.default.getStateByKey(this.key);
+		var globalState = _storageManager2["default"].getStateByKey(this.key);
 
 		if (path.length === 0) {
 			return globalState;
@@ -246,12 +246,12 @@ var Persist = function () {
 
 	Persist.prototype.set = function set(path, value) {
 		// find path
-		var globalState = _storageManager2.default.getStateByKey(this.key);
+		var globalState = _storageManager2["default"].getStateByKey(this.key);
 
 		if (path.length === 0) {
-			_storageManager2.default.setStateByKey(this.key, value);
+			_storageManager2["default"].setStateByKey(this.key, value);
 		} else {
-			_storageManager2.default.setStateByKey(this.key, setRec(globalState, path.split("."), value));
+			_storageManager2["default"].setStateByKey(this.key, setRec(globalState, path.split("."), value));
 		}
 
 		return this;
@@ -271,7 +271,7 @@ var Persist = function () {
 	return Persist;
 }();
 
-exports.default = Persist;
+exports["default"] = Persist;
 module.exports = exports["default"];
 
 /***/ }),
@@ -284,7 +284,7 @@ module.exports = exports["default"];
 exports.__esModule = true;
 var CONST_PERSIST = "___persist___";
 
-exports.default = CONST_PERSIST;
+exports["default"] = CONST_PERSIST;
 module.exports = exports["default"];
 
 /***/ }),
@@ -298,14 +298,14 @@ var _Persist = __webpack_require__(2);
 
 var _Persist2 = _interopRequireDefault(_Persist);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-_Persist2.default.VERSION = "2.0.0-rc2"; /**
-                                         * Copyright (c) 2015 NAVER Corp.
-                                         * egjs-persist projects are licensed under the MIT license
-                                         */
+_Persist2["default"].VERSION = "2.0.0-rc2"; /**
+                                            * Copyright (c) 2015 NAVER Corp.
+                                            * egjs-persist projects are licensed under the MIT license
+                                            */
 
-module.exports = _Persist2.default;
+module.exports = _Persist2["default"];
 
 /***/ }),
 /* 5 */
@@ -328,7 +328,7 @@ var _consts = __webpack_require__(3);
 
 var _consts2 = _interopRequireDefault(_consts);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var isSupportState = "replaceState" in _browser.history && "state" in _browser.history;
 
@@ -336,15 +336,15 @@ function isStorageAvailable(storage) {
 	if (!storage) {
 		return undefined;
 	}
-	var TMP_KEY = "__tmp__" + _consts2.default;
+	var TMP_KEY = "__tmp__" + _consts2["default"];
 
 	try {
 		// In case of iOS safari private mode, calling setItem on storage throws error
-		storage.setItem(TMP_KEY, _consts2.default);
+		storage.setItem(TMP_KEY, _consts2["default"]);
 
 		// In Chrome incognito mode, can not get saved value
 		// In IE8, calling storage.getItem occasionally makes "Permission denied" error
-		return storage.getItem(TMP_KEY) === _consts2.default;
+		return storage.getItem(TMP_KEY) === _consts2["default"];
 	} catch (e) {
 		return false;
 	}
@@ -369,7 +369,7 @@ function warnInvalidStorageValue() {
 }
 
 function getStorageKey() {
-	return storage ? _browser.location.href + _consts2.default : undefined;
+	return storage ? _browser.location.href + _consts2["default"] : undefined;
 }
 
 function getStorage() {
@@ -381,7 +381,7 @@ function getStorage() {
  */
 function getState() {
 	var state = void 0;
-	var PERSIST_KEY = _browser.location.href + _consts2.default;
+	var PERSIST_KEY = _browser.location.href + _consts2["default"];
 	var stateStr = void 0;
 
 	if (storage) {
@@ -438,7 +438,7 @@ function getStateByKey(key) {
  * Set state value
  */
 function setState(state) {
-	var PERSIST_KEY = _browser.location.href + _consts2.default;
+	var PERSIST_KEY = _browser.location.href + _consts2["default"];
 
 	if (storage) {
 		if (state) {
@@ -461,7 +461,7 @@ function setState(state) {
 		}
 	}
 
-	state ? _browser.window[_consts2.default] = true : delete _browser.window[_consts2.default];
+	state ? _browser.window[_consts2["default"]] = true : delete _browser.window[_consts2["default"]];
 }
 
 function setStateByKey(key, data) {
@@ -483,9 +483,9 @@ function reset() {
 }
 
 // in case of reload
-!_utils2.default.isBackForwardNavigated() && reset();
+!_utils2["default"].isBackForwardNavigated() && reset();
 
-exports.default = {
+exports["default"] = {
 	reset: reset,
 	setStateByKey: setStateByKey,
 	getStateByKey: getStateByKey,
