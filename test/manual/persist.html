@@ -139,6 +139,7 @@ button:focus {
 		</section>
 <script>
 var isPersistNeeded = eg.Persist.isNeeded();
+
 var newsData = [
 	"French far right National Front 'routed' in key vote",
 	"China football revolution can be a financial game changer",
@@ -146,26 +147,29 @@ var newsData = [
 	"'If I became an informer the chemotherapy could continue'",
 	"The employees shut inside coffins"
 ];
+
 var newsAddUnit = 5;
+
 function NewsLoader(baseElId) {
 	this.baseId = baseElId;
+	this.persist = new eg.Persist(this.baseId);
 	this.$baseEl = $("#" + this.baseId);
 	this.$ListContainer = $(".listContainer", this.$baseEl);
 	this.$LoadBtn= $("button", this.$baseEl);
 	this.$LoadBtn.on("click", $.proxy( this._appendNews, this ));
-// Prevent unintended block highlighting when using delegation
+	
+	// Prevent unintended block highlighting when using delegation
 	this.$ListContainer.addClass("NO_TAP_HIGHLIGHT");
     if(isPersistNeeded) {
 		this.$ListContainer.on("click", "a", $.proxy( function(e){
 	    /*
 	     * @todo : Restore component state
 	     */
-			var data = eg.Persist(this.baseId);
-			data.scrollPos = document.body.scrollTop;
-			eg.Persist(this.baseId, data);
+			this.persist.set("scrollPos", document.body.scrollTop);
 		}, this));
-		var data = eg.Persist(this.baseId);
-		data && data.html && this.$ListContainer.html(data.html);
+
+		var persistedHtml = this.persist.get("html");
+		persistedHtml && this.$ListContainer.html(persistedHtml);
     }
 }
 NewsLoader.prototype._appendNews = function() {
@@ -179,18 +183,12 @@ NewsLoader.prototype._appendNews = function() {
      * @todo : use Persist method to save data for restoring component state
      */
     if(isPersistNeeded) {
- 		var data = eg.Persist(this.baseId) || {};
-		data.html = this.$ListContainer.html();
-		eg.Persist(this.baseId, data);   	
+		this.persist.set("html", this.$ListContainer.html());  	
     }
 };
+
 new NewsLoader("newsLoader1");
 new NewsLoader("newsLoader2");
-// Restore scroll position
-if(isPersistNeeded) {
-	var data = eg.Persist(this.baseId);
-	data && window.scrollTo(0, data.scrollPos);
-}
 </script>
 </body>
 </html>
