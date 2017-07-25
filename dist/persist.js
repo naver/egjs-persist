@@ -5,7 +5,7 @@
  * @egjs/persist JavaScript library
  * 
  * 
- * @version 2.0.0-rc
+ * @version 2.0.0-rc2
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -300,10 +300,10 @@ var _Persist2 = _interopRequireDefault(_Persist);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-_Persist2["default"].VERSION = "2.0.0-rc"; /**
-                                           * Copyright (c) 2015 NAVER Corp.
-                                           * egjs-persist projects are licensed under the MIT license
-                                           */
+_Persist2["default"].VERSION = "2.0.0-rc2"; /**
+                                            * Copyright (c) 2015 NAVER Corp.
+                                            * egjs-persist projects are licensed under the MIT license
+                                            */
 
 module.exports = _Persist2["default"];
 
