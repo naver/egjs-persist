@@ -21,10 +21,20 @@
 	<script src="release/latest/dist/persist.min.js"></script>
 
 <script>
+	var homeUrl = window.location.href;
+	if (homeUrl.indexOf("#") !== -1) {
+		homeUrl = homeUrl.substr(0, homeUrl.indexOf("#"));
+	}
+	homeUrl = homeUrl
+		.replace("/index.html", "/")
+		.replace("/gallery.html", "/");
+	if (homeUrl[homeUrl.length-1] !== "/") {
+		homeUrl += "/";
+	};
+	window.HOMELINK = homeUrl;
 	window.LIBLINK = [];
 	
-	window.LIBLINK.push(window.location.href.replace("/index.html", "/")
-            .replace("/gallery.html", "/") + "release/latest/dist/persist.min.js");
+	window.LIBLINK.push(window.HOMELINK + "release/latest/dist/persist.min.js");
 	
 </script>
 <body>
@@ -59,7 +69,7 @@
                             <a class="page-scroll" href="release/latest/doc" target="_blank">API Document</a>
                         </li>
                         <li>
-                            <a class="page-scroll" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0-rc2</a>
+                            <a class="page-scroll" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0</a>
                         </li>
                     </ul>
                 </div>
@@ -74,7 +84,7 @@
         <div class="btns">
             <!--<a class="btn btn-cta-primary" href="release/latest/doc" target="_blank">Github</a>-->
             <a class="btn btn-cta-primary" href="release/latest/doc" target="_blank">API Document</a>
-            <a class="btn btn-cta-primary" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0-rc2</a>
+            <a class="btn btn-cta-primary" href="//github.com/naver/egjs-persist/releases" target="_blank">v2.0.0</a>
         </div>
     </div>
     <div class="social-media">
@@ -115,7 +125,7 @@
 </div>
 
 <h4 id="or-use-cdn">or use CDN</h4>
-<div class="highlighter-rouge"><pre class="highlight"><code>
+<div class="language-html highlighter-rouge"><pre class="highlight"><code>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//naver.github.io/egjs-persist/release/latest/dist/persist.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 
 </code></pre>
@@ -124,19 +134,19 @@
 <h3 id="initialize">Initialize</h3>
 
 <h4 id="es5">ES5</h4>
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
 </code></pre>
 </div>
 
 <h4 id="es6">ES6+</h4>
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
 </code></pre>
 </div>
 
 <h3 id="usage">Usage</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="kr">import</span> <span class="nx">Persist</span> <span class="nx">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
 <span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
 
 <span class="c1">// Overwrite global object</span>
@@ -221,7 +231,7 @@
     </div>
 </div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>
+<div class="language-js highlighter-rouge"><pre class="highlight"><code>
 <span class="kr">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"commentModule"</span><span class="p">);</span>
 
 <span class="nx">$</span><span class="p">(</span><span class="s2">".loadCmtBtn"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
