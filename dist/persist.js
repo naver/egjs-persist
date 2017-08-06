@@ -52,9 +52,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -82,7 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -150,9 +147,29 @@ module.exports = exports["default"];
 "use strict";
 
 
+var _Persist = __webpack_require__(3);
+
+var _Persist2 = _interopRequireDefault(_Persist);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+_Persist2["default"].VERSION = "2.0.0-rc"; /**
+                                           * Copyright (c) 2015 NAVER Corp.
+                                           * egjs-persist projects are licensed under the MIT license
+                                           */
+
+module.exports = _Persist2["default"];
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 exports.__esModule = true;
 
-var _storageManager = __webpack_require__(5);
+var _storageManager = __webpack_require__(4);
 
 var _storageManager2 = _interopRequireDefault(_storageManager);
 
@@ -275,40 +292,7 @@ exports["default"] = Persist;
 module.exports = exports["default"];
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-var CONST_PERSIST = "___persist___";
-
-exports["default"] = CONST_PERSIST;
-module.exports = exports["default"];
-
-/***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _Persist = __webpack_require__(2);
-
-var _Persist2 = _interopRequireDefault(_Persist);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-_Persist2["default"].VERSION = "2.0.0-rc"; /**
-                                           * Copyright (c) 2015 NAVER Corp.
-                                           * egjs-persist projects are licensed under the MIT license
-                                           */
-
-module.exports = _Persist2["default"];
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -324,7 +308,7 @@ var _utils = __webpack_require__(1);
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _consts = __webpack_require__(3);
+var _consts = __webpack_require__(5);
 
 var _consts2 = _interopRequireDefault(_consts);
 
@@ -492,6 +476,19 @@ exports["default"] = {
 	getStorageKey: getStorageKey,
 	getStorage: getStorage
 };
+module.exports = exports["default"];
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+var CONST_PERSIST = "___persist___";
+
+exports["default"] = CONST_PERSIST;
 module.exports = exports["default"];
 
 /***/ })
