@@ -3,6 +3,7 @@ home: //naver.github.io/egjs
 desc: Provide cache interface to handle persisted data among history navigation.
 dist:
 - release/latest/dist/persist.min.js
+hashtag: "#bfcache #storage"
 GA: UA-70842526-19
 github:
   user: naver
