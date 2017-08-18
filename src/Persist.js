@@ -63,7 +63,7 @@ class Persist {
 			}
 			currentItem = currentItem[pathToken[i]];
 		}
-		if (!isTargetExist || !currentItem) {
+		if (!isTargetExist || currentItem === undefined) {
 			return null;
 		}
 		return currentItem;
