@@ -6,7 +6,7 @@ describe("Persist", function() {
         it("save number, get number", () => {
             // Given
             const persist = new Persist("TESTKEY");
-            persist.set("", null);            
+            persist.set("", null);
             const data = 100;
 
             // When
@@ -19,7 +19,7 @@ describe("Persist", function() {
         it("save string data, get string data", () => {
             // Given
             const persist = new Persist("TESTKEY");
-            persist.set("", null);  
+            persist.set("", null);
             const data = JSON.stringify({
                 "scrollTop": 100
             });
@@ -34,7 +34,7 @@ describe("Persist", function() {
         it("save object data, get object data", () => {
             // Given
             const persist = new Persist("TESTKEY");
-            persist.set("", null); 
+            persist.set("", null);
             const data = {
                 "scrollTop": 100
             };
@@ -49,7 +49,7 @@ describe("Persist", function() {
         it("remove state data with undefined and key", () => {
             // Given
             const persist = new Persist("TESTKEY");
-            persist.set("", null); 
+            persist.set("", null);
             const data = {
                 "scrollTop": 100
             };
@@ -65,7 +65,7 @@ describe("Persist", function() {
         it("remove state data with null and key", () => {
             // Given
             const persist = new Persist("TESTKEY");
-            persist.set("", null); 
+            persist.set("", null);
             const data = {
                 "scrollTop": 100
             };
@@ -80,6 +80,38 @@ describe("Persist", function() {
     });
 
     describe("path param with instance", function() {
+    	describe("get global", function() {
+    		it("can get data with empty path string", () => {
+    			// Given
+				const persist = new Persist("TESTKEY");
+
+				// When
+				persist.set("a", 1);
+				persist.set("b", 2);
+
+				// Then
+				expect(persist.get("")).to.deep.equal({
+					a: 1,
+					b: 2
+				});
+			});
+
+			it("can get data without params", () => {
+				// Given
+				const persist = new Persist("TESTKEY");
+
+				// When
+				persist.set("a", 1);
+				persist.set("b", 2);
+
+				// Then
+				expect(persist.get()).to.deep.equal({
+					a: 1,
+					b: 2
+				});
+			});
+		});
+
         describe("set global with empty path string", function() {
             it("can save primitive type: number", () => {
                 // Given
@@ -165,7 +197,7 @@ describe("Persist", function() {
 
                 // Then
                 expect(persist.get("")).to.deep.equal(
-                    {   
+                    {
                         "foo": { "name": "john" },
                         "bar": { "name": "mary" }
                     }
@@ -174,7 +206,7 @@ describe("Persist", function() {
                 expect(persist.get("bar")).to.deep.equal({ "name": "mary" });
                 expect(persist.get("foo.name")).equal("john");
                 expect(persist.get("bar.name")).equal("mary");
-            });  
+            });
 
             it("can set additional property", () => {
                 // Given
@@ -266,7 +298,7 @@ describe("Persist", function() {
                 const persist = new MockedPersist("TESTKEY");
                 persist.set("", null);
                 persist.set("0", { "name": "john" });
-  
+
 
                 // When
                 persist.set("item", { "name": "john" });
@@ -349,7 +381,7 @@ describe("Persist", function() {
                 // When
                 persist.set("index", 3)
                     .set("isActive", true);
-                
+
                 // Then
                 expect(persist.get("index")).to.equal(3);
                 expect(persist.get("isActive")).to.equal(true);
