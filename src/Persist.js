@@ -41,14 +41,14 @@ class Persist {
 
 	/**
 	 * Read value
-	 * @param {String} path target path
+	 * @param {String?} path target path
 	 * @return {String|Number|Boolean|Object|Array}
 	 */
 	get(path) {
 		// find path
 		const globalState =	StorageManager.getStateByKey(this.key);
 
-		if (path.length === 0) {
+		if (!path || path.length === 0) {
 			return globalState;
 		}
 
