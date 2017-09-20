@@ -6,11 +6,12 @@ var UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 var uglifyConfig = require("./uglify");
 var banner = require("./banner");
 
-
 var config = {
 	entry: {
 		"persist": "./src/index.js",
-		"persist.min": "./src/index.js"
+		"persist.min": "./src/index.js",
+		"persist-migrate": "./src/persist-migrate.js",
+		"persist-migrate.min": "./src/persist-migrate.js",
 	},
 	module: {
 		rules: [{

@@ -4,6 +4,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      "./dist/persist.min.js",
+      "./dist/persist-migrate.js",
       "./node_modules/lite-fixture/index.js",
       "./test/unit/**/*.spec.js"
     ],
