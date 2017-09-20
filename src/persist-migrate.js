@@ -1,4 +1,4 @@
-/*eslint-disable */
+/* eslint-disable */
 export default (function(eg) {
 	if (!eg || !eg.Persist) {
 		return;
@@ -39,4 +39,4 @@ export default (function(eg) {
 	return eg.Persist;
 })(eg);
 
-/*eslint-enable */
+/* eslint-enable */
