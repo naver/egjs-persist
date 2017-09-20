@@ -1,4 +1,6 @@
 /* eslint-disable */
+import {window} from "./browser";
+
 export default (function(eg) {
 	if (!eg || !eg.Persist) {
 		return;
@@ -37,6 +39,6 @@ export default (function(eg) {
 	eg.Persist.isNeeded = isNeeded;
 	eg.Persist.prototype = oldConstructor;
 	return eg.Persist;
-})(eg);
+})(window.eg);
 
 /* eslint-enable */

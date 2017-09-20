@@ -1,4 +1,17 @@
-const Persist = window.eg.Persist;
+import OriginalPersist from "../../src/Persist";
+import PersistMigrateInjector from "inject-loader!../../src/persist-migrate";
+
+const Persist = PersistMigrateInjector(
+    {
+        "./browser": {
+            "window": {
+                "eg": {
+                    Persist: OriginalPersist
+                }
+            }
+        }
+    }
+);
 
 describe("Persist with persist-migrate", function() {
     describe("deprecated API", function() {
