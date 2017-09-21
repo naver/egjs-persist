@@ -133,10 +133,14 @@ function setState(state) {
 					location.href
 				);
 			} else {
+				/* eslint-disable no-console */
 				console.warn("To use a history object, it must be an object that is not a primitive type.");
+				/* eslint-enable no-console */
 			}
 		} catch (e) {
+			/* eslint-disable no-console */
 			console.warn(e.message);
+			/* eslint-enable no-console */
 		}
 	}
 

@@ -1,7 +1,41 @@
-import Persist from "../../src/Persist";
-import PersistInjector from "inject-loader!../../src/Persist";
+import OriginalPersist from "../../src/Persist";
+import PersistMigrateInjector from "inject-loader!../../src/persist-migrate";
 
-describe("Persist", function() {
+const Persist = PersistMigrateInjector(
+    {
+        "./browser": {
+            "window": {
+                "eg": {
+                    Persist: OriginalPersist
+                }
+            }
+        }
+    }
+);
+
+describe("Persist with persist-migrate", function() {
+    describe("deprecated API", function() {
+        it("can set data with empty key string", () => {
+            // Given
+            const testObject = {name: "john"};
+
+            // When
+            Persist(testObject);
+
+            // Then
+            expect(Persist()).to.deep.equal({name: "john"});
+        });      
+        it("can set data with key string", () => {
+            // Given
+            const testObject = {name: "john"};
+
+            // When
+            Persist("TESTKEY", testObject);
+
+            // Then
+            expect(Persist("TESTKEY")).to.deep.equal({name: "john"});
+        }); 
+    });
 
     describe("isNeeded", function() {
         it("isNeeded on chrome", () => {
@@ -291,23 +325,16 @@ describe("Persist", function() {
         });
 
         describe("array", function() {
+            beforeEach(function() {
+                sinon.spy(console, 'warn');
+            });
+            afterEach(function() {
+                console.warn.restore();
+            });
 
             it("cannot setting key value on array with warning", () => {
                 // Given
-                let warnCalled = false;
-                const MockedPersist = PersistInjector(
-                    {
-                        "./browser": {
-                            console: {
-                                warn: function() {
-                                    warnCalled = true;
-                                }
-                            }
-                        }
-                    }
-                );
-
-                const persist = new MockedPersist("TESTKEY");
+                const persist = new Persist("TESTKEY");
                 persist.set("", null);
                 persist.set("0", { "name": "john" });
 
@@ -316,7 +343,7 @@ describe("Persist", function() {
                 persist.set("item", { "name": "john" });
 
                 // Then
-                expect(warnCalled).is.ok;
+                expect(console.warn.called).is.ok;
                 expect(persist.get("item")).is.equal(null);
             });
 

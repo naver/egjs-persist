@@ -101,4 +101,6 @@ class Persist {
 	}
 }
 
+Persist.StorageManager = StorageManager;
+
 export default Persist;
