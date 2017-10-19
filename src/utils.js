@@ -22,7 +22,7 @@ const isNeeded = (function() {
 
 // In case of IE8, TYPE_BACK_FORWARD is undefined.
 function isBackForwardNavigated() {
-	return performance.navigation.type === TYPE_BACK_FORWARD;
+	return performance && (performance.navigation.type === TYPE_BACK_FORWARD);
 }
 
 export default {
