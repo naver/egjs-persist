@@ -1,7 +1,7 @@
 import {navigator, RegExp, parseFloat, performance} from "./browser";
 
 const userAgent = navigator.userAgent;
-const TYPE_BACK_FORWARD = performance.navigation.TYPE_BACK_FORWARD || 2;
+const TYPE_BACK_FORWARD = (performance && performance.navigation.TYPE_BACK_FORWARD) || 2;
 
 const isNeeded = (function() {
 	const isIOS = (new RegExp("iPhone|iPad", "i")).test(userAgent);
@@ -22,7 +22,7 @@ const isNeeded = (function() {
 
 // In case of IE8, TYPE_BACK_FORWARD is undefined.
 function isBackForwardNavigated() {
-	return performance.navigation.type === TYPE_BACK_FORWARD;
+	return performance && (performance.navigation.type === TYPE_BACK_FORWARD);
 }
 
 export default {

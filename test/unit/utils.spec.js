@@ -2,6 +2,9 @@ import {RegExp, parseFloat, performance} from "../../src/browser";
 import utils from "../../src/utils";
 import UtilsInjector from "inject-loader!../../src/utils";
 
+
+
+
 describe("utils", function() {
     var ualist = [
         {
@@ -138,6 +141,32 @@ describe("utils", function() {
 
             // Then
             expect(isBackForwardNavigated).is.not.ok;
+        });
+
+        it(`should not throw error on iOS 7`, () => {
+            // Given
+            let isErrorThrown = false;
+
+            // When
+            try {
+                var MockUtils = UtilsInjector(
+                    {
+                        "./browser": {
+                            navigator: navigator,
+                            RegExp: RegExp,
+                            parseFloat: parseFloat,
+                            performance: performance
+                        }
+                    }
+                );
+                MockUtils.isBackForwardNavigated();
+            } catch (e) {
+                debugger;
+                isErrorThrown = true;
+            }
+
+            // Then
+            expect(isErrorThrown).is.not.ok;
         });
 
         it(`should not throw error on IE8`, () => {
