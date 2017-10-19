@@ -1,7 +1,7 @@
 import {navigator, RegExp, parseFloat, performance} from "./browser";
 
 const userAgent = navigator.userAgent;
-const TYPE_BACK_FORWARD = performance.navigation.TYPE_BACK_FORWARD || 2;
+const TYPE_BACK_FORWARD = (performance && performance.navigation.TYPE_BACK_FORWARD) || 2;
 
 const isNeeded = (function() {
 	const isIOS = (new RegExp("iPhone|iPad", "i")).test(userAgent);
