@@ -1,5 +1,25 @@
 import Persist from "../../src/Persist";
 import PersistInjector from "inject-loader!../../src/Persist";
+import StorageManagerInjector from "inject-loader!../../src/storageManager";
+
+const StorageManagerUsingHistory = StorageManagerInjector(
+    {
+        "./browser": {
+            window: window,
+            history: window.history,
+            location: window.location,
+            JSON: window.JSON,
+            sessionStorage: null,
+            localStorage: null
+        }
+    }
+);
+
+const PersistUsingHistory = PersistInjector(
+    {
+        "./storageManager": StorageManagerUsingHistory
+    }
+);
 
 describe("Persist", function() {
 
@@ -11,6 +31,23 @@ describe("Persist", function() {
 
             // Then
             expect(isNeeded).to.be.true;
+        });
+    });
+
+    describe("History", function() {
+        it("save index, get index when history.state is null", () => {
+            // Given
+            history.replaceState(null,null,null);
+            expect(history.state).to.equal(null);
+            const persist = new PersistUsingHistory("TESTKEY");
+            
+            // When
+            persist.set("flick", {
+                index: 10
+            });
+
+            // Then
+            expect(persist.get("flick.index")).to.equal(10);
         });
     });
 
