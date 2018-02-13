@@ -60,11 +60,13 @@ function getState() {
 	if (storage) {
 		stateStr = storage.getItem(PERSIST_KEY);
 	} else if (history.state) {
-		if (typeof history.state !== "object") {
+		if (typeof history.state === "object" && history.state !== null) {
 			stateStr = history.state[PERSIST_KEY];
 		} else {
 			warnInvalidStorageValue();
 		}
+	} else {
+		stateStr = history.state;
 	}
 
 	// the storage is clean
@@ -123,7 +125,7 @@ function setState(state) {
 		}
 	} else {
 		try {
-			const historyState = history.state;
+			const historyState = history.state === null ? {} : history.state;
 
 			if (typeof historyState === "object") {
 				historyState[PERSIST_KEY] = JSON.stringify(state);
