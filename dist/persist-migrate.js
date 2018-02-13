@@ -5,7 +5,7 @@
  * @egjs/persist JavaScript library
  * 
  * 
- * @version 2.1.2-rc
+ * @version 2.1.2
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
