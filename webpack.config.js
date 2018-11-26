@@ -5,13 +5,14 @@ var StringReplacePlugin = require("string-replace-webpack-plugin");
 
 var config = {
 	entry: {
-		"persist": "./src/index.js"
+		"persist": "./src/Persist.js"
 	},
 	output: {
 		path: path.resolve(__dirname, "dist"),
 		filename: "[name].js",
 		library: [pkg.namespace.eg, "Persist"],
 		libraryTarget: "umd",
+		libraryExport: "default",
 		umdNamedDefine: true
 	},
 	externals: [],	
