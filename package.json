@@ -30,6 +30,16 @@
 	"author": {
 		"name": "NAVER Corp."
 	},
+	"keywords": [
+		"persist",
+		"storage",
+		"session",
+		"local",
+		"sessionStorage",
+		"localstorage",
+		"history",
+		"navigtation"
+	],
 	"namespace": {
 		"eg": "eg"
 	},
