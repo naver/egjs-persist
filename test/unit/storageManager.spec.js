@@ -1,4 +1,4 @@
-import StorageManager from "../../src/storageManager";
+import * as StorageManager from "../../src/storageManager";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 
 describe("StorageManager", function() {

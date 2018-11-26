@@ -1,8 +1,8 @@
-import {window, history, location, JSON, sessionStorage, localStorage} from "./browser";
-import utils from "./utils";
+import {window, history, location, sessionStorage, localStorage} from "./browser";
+import {isBackForwardNavigated} from "./utils";
 import CONST_PERSIST from "./consts";
 
-const isSupportState = "replaceState" in history && "state" in history;
+const isSupportState = history && "replaceState" in history && "state" in history;
 
 function isStorageAvailable(storage) {
 	if (!storage) {
@@ -114,7 +114,7 @@ function getStateByKey(key) {
  * Set state value
  */
 function setState(state) {
-	const PERSIST_KEY = location.href + CONST_PERSIST;
+	const PERSIST_KEY = (location ? location.href : "") + CONST_PERSIST;
 
 	if (storage) {
 		if (state) {
@@ -125,9 +125,9 @@ function setState(state) {
 		}
 	} else {
 		try {
-			const historyState = history.state === null ? {} : history.state;
+			const historyState = !history || history.state == null ? {} : history.state;
 
-			if (typeof historyState === "object") {
+			if (history && typeof historyState === "object") {
 				historyState[PERSIST_KEY] = JSON.stringify(state);
 				history.replaceState(
 					historyState,
@@ -168,9 +168,9 @@ function reset() {
 }
 
 // in case of reload
-!utils.isBackForwardNavigated() && reset();
+!isBackForwardNavigated() && reset();
 
-export default {
+export {
 	reset,
 	setStateByKey,
 	getStateByKey,

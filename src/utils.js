@@ -1,6 +1,6 @@
-import {navigator, RegExp, parseFloat, performance} from "./browser";
+import {navigator, parseFloat, performance} from "./browser";
 
-const userAgent = navigator.userAgent;
+const userAgent = navigator ? navigator.userAgent : "";
 const TYPE_BACK_FORWARD = (performance && performance.navigation.TYPE_BACK_FORWARD) || 2;
 
 const isNeeded = (function() {
@@ -25,7 +25,7 @@ function isBackForwardNavigated() {
 	return performance && (performance.navigation.type === TYPE_BACK_FORWARD);
 }
 
-export default {
+export {
 	isBackForwardNavigated,
 	isNeeded,
 };
