@@ -2,17 +2,14 @@ const pluginBabel = require("rollup-plugin-babel");
 const pluginReplace = require("rollup-plugin-replace");
 const pluginUglify = require("rollup-plugin-uglify").uglify;
 
-const {common, pkgd} = require("../config/banner");
+const {common} = require("../config/banner");
 const version = require("../package.json").version;
 
 
 const bannerCommon = `/*
 ${common}
 */`;
-const bannerPkgd = `/*
-${common}
-${pkgd}
-*/`;
+
 const uglify = pluginUglify({
 	sourcemap: true,
 	output: {
