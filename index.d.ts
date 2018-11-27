@@ -1,5 +1,5 @@
 declare module "@egjs/persist" {
-	type persistValueType = string | number | boolean | object | array | undefined;
+	type persistValueType = any | null | undefined;
 
 	class Persist {
 		/**
