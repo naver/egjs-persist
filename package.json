@@ -4,7 +4,7 @@
 	"description": "Provide cache interface to handle persisted data among history navigation.",
 	"main": "dist/persist.js",
 	"module": "dist/persist.esm.js",
-	"es2015": "src/persist.esm.js",
+	"es2015": "dist/persist.esm.js",
 	"sideEffects": false,
 	"scripts": {
 		"start": "webpack-dev-server --open",
