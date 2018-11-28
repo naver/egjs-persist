@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Source: /Users/user/Desktop/naver/egjs-persist/src/Persist.js | egjs::persist - API</title>
+    
+    <meta name="description" content="Provide cache interface to handle persisted data among history navigation." />
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <link rel="canonical" href="http://naver.github.io/egjs-persist/release/latest/doc/"/>
+    
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jaguar.css">
+    
+    
+    <script>
+    var config = {"monospaceLinks":true,"cleverLinks":true,"default":{"outputSourceFiles":true},"applicationName":"eg.Persist","disqus":"egjs","googleAnalytics":"UA-70842526-19","openGraph":{"title":"","type":"website","image":"","site_name":"","url":""},"meta":{"title":"egjs::persist - API","description":"Provide cache interface to handle persisted data among history navigation.","keyword":""},"linenums":true,"link":{"canonical":"http://naver.github.io/egjs-persist/release/latest/doc/"}};
+    </script>
+    
+
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', config.googleAnalytics]);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+<body>
+<div id="wrap" class="clearfix">
+    
+<div class="navigation">
+    <h3 class="applicationName">
+        <a href="//naver.github.io/egjs/"><img style="width:40px; height:20px;" src="img/type_white.svg"/></a>
+        <a href="//naver.github.io/egjs-persist/">Persist</a>
+    </h3>
+
+    <div class="search">
+        <input id="search" type="text" class="form-control input-sm" placeholder="Search Documentations">
+    </div>
+    <ul class="list">
+        <li class="item">
+            <span class="title">
+                <a href="index.html">README</a>
+            </span>
+        </li>
+    
+        <!-- Non Grouping Version -->
+        
+            
+
+<li class="item" data-name="eg.Persist">
+    <span class="title">
+        <a href="eg.Persist.html">eg.Persist</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    <span class="subtitle">Methods</span>
+    
+        <li data-name="eg.Persist.isNeeded"><a href="eg.Persist.html#.isNeeded">isNeeded</a></li>
+    
+        <li data-name="eg.Persist#get"><a href="eg.Persist.html#get">get</a></li>
+    
+        <li data-name="eg.Persist#set"><a href="eg.Persist.html#set">set</a></li>
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+    
+    </ul>
+</div>
+
+    <div class="main">
+        <h1 class="page-title" data-filename="-_Users_user_Desktop_naver_egjs-persist_src_Persist.js.html">Source: /Users/user/Desktop/naver/egjs-persist/src/Persist.js</h1>
+        
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as StorageManager from "./storageManager";
+import {isNeeded} from "./utils";
+import {console} from "./browser";
+
+function setRec(obj, path, value) {
+	let _obj = obj;
+
+	if (!_obj) {
+		_obj = isNaN(path[0]) ? {} : [];
+	}
+
+	const head = path.shift();
+
+	if (path.length === 0) {
+		if (_obj instanceof Array &amp;&amp; isNaN(head)) {
+			console.warn("Don't use key string on array");
+		}
+		_obj[head] = value;
+		return _obj;
+	}
+
+	_obj[head] = setRec(_obj[head], path, value);
+	return _obj;
+}
+
+/**
+ * Get or store the current state of the web page using JSON.
+ * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
+ * @alias eg.Persist
+ *
+ * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
+ */
+class Persist {
+	static VERSION = "#__VERSION__#";
+	static StorageManager = StorageManager;
+	/**
+	* Constructor
+	* @param {String} key The key of the state information to be stored &lt;ko>저장할 상태 정보의 키&lt;/ko>
+	**/
+	constructor(key, value) {
+		this.key = key;
+	}
+
+	/**
+	 * Read value
+	 * @param {String?} path target path
+	 * @return {String|Number|Boolean|Object|Array}
+	 */
+	get(path) {
+		// find path
+		const globalState =	StorageManager.getStateByKey(this.key);
+
+		if (!path || path.length === 0) {
+			return globalState;
+		}
+
+		const pathToken = path.split(".");
+		let currentItem = globalState;
+		let isTargetExist = true;
+
+		for (let i = 0; i &lt; pathToken.length; i++) {
+			if (!currentItem) {
+				isTargetExist = false;
+				break;
+			}
+			currentItem = currentItem[pathToken[i]];
+		}
+		if (!isTargetExist || !currentItem) {
+			return null;
+		}
+		return currentItem;
+	}
+
+	/**
+	 * Save value
+	 * @param {String} path target path
+	 * @param {String|Number|Boolean|Object|Array} value value to save
+	 * @return {Persist}
+	 */
+	set(path, value) {
+		// find path
+		const globalState =	StorageManager.getStateByKey(this.key);
+
+		if (path.length === 0) {
+			StorageManager.setStateByKey(this.key, value);
+		} else {
+			StorageManager.setStateByKey(
+				this.key,
+				setRec(globalState, path.split("."), value)
+			);
+		}
+
+		return this;
+	}
+
+	/**
+	 * @static
+	 * Return whether you need "Persist" module by checking the bfCache support of the current browser
+	 * @return {Boolean}
+	 */
+	static isNeeded() {
+		return isNeeded;
+	}
+}
+
+export default Persist;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+
+        
+        <!-- disqus code -->
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        <!-- // disqus code -->
+        
+
+        <footer>
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 28 2018 16:36:12 GMT+0900 (Korean Standard Time)
+        </footer>
+    </div>
+</div>
+<script>prettyPrint();</script>
+<script src="scripts/main.js"></script>
+</body>
+</html>
