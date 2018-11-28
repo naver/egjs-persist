@@ -1,6 +1,6 @@
 {
 	"name": "@egjs/persist",
-	"version": "2.1.0-snapshot",
+	"version": "2.1.1",
 	"description": "Provide cache interface to handle persisted data among history navigation.",
 	"main": "dist/persist.js",
 	"module": "dist/persist.esm.js",
