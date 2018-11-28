@@ -8,7 +8,5 @@ export const localStorage = win.localStorage;
 export const location = win.location;
 export const sessionStorage = win.sessionStorage;
 export const navigator = win.navigator;
-export const JSON = win.JSON;
-export const RegExp = win.RegExp;
 export const parseFloat = win.parseFloat;
 export const performance = win.performance;

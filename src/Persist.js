@@ -1,4 +1,4 @@
-import StorageManager from "./storageManager";
+import * as StorageManager from "./storageManager";
 import {isNeeded} from "./utils";
 import {console} from "./browser";
 
@@ -31,6 +31,8 @@ function setRec(obj, path, value) {
  * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
  */
 class Persist {
+	static VERSION = "#__VERSION__#";
+	static StorageManager = StorageManager;
 	/**
 	* Constructor
 	* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
@@ -100,7 +102,5 @@ class Persist {
 		return isNeeded;
 	}
 }
-
-Persist.StorageManager = StorageManager;
 
 export default Persist;
