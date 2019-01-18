@@ -33,6 +33,7 @@ export default (function(eg) {
 		}
 
 		// when called as constructer
+		this.state = {key, hash: true};
 		this.key = key;
 		return undefined;
 	};

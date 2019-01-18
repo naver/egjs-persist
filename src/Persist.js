@@ -35,10 +35,24 @@ class Persist {
 	static StorageManager = StorageManager;
 	/**
 	* Constructor
-	* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {String | Object} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
 	**/
-	constructor(key, value) {
-		this.key = key;
+	constructor(key) {
+		this.state = {
+			hash: true,
+			key: "",
+		};
+
+		const state = this.state;
+		const keyType = typeof key;
+
+		if (keyType === "string") {
+			state.key = key;
+		} else if (keyType === "object") {
+			for (const name in keyType) {
+				state[name] = keyType[name];
+			}
+		}
 	}
 
 	/**
@@ -48,7 +62,8 @@ class Persist {
 	 */
 	get(path) {
 		// find path
-		const globalState =	StorageManager.getStateByKey(this.key);
+		const {key, hash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, hash);
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -79,14 +94,16 @@ class Persist {
 	 */
 	set(path, value) {
 		// find path
-		const globalState =	StorageManager.getStateByKey(this.key);
+		const {key, hash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, hash);
 
 		if (path.length === 0) {
-			StorageManager.setStateByKey(this.key, value);
+			StorageManager.setStateByKey(key, value, hash);
 		} else {
 			StorageManager.setStateByKey(
-				this.key,
-				setRec(globalState, path.split("."), value)
+				key,
+				setRec(globalState, path.split("."), value),
+				hash
 			);
 		}
 

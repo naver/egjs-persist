@@ -49,12 +49,17 @@ function getStorage() {
 	return storage;
 }
 
+function getKey(hash = true) {
+	const href = location.href;
+
+	return (hash ? href : href.split("#")[0]) + CONST_PERSIST;
+}
 /*
  * Get state value
  */
-function getState() {
+function getState(hash) {
+	const PERSIST_KEY = getKey(hash);
 	let state;
-	const PERSIST_KEY = location.href + CONST_PERSIST;
 	let stateStr;
 
 	if (storage) {
@@ -96,12 +101,12 @@ function getState() {
 	return state;
 }
 
-function getStateByKey(key) {
+function getStateByKey(key, hash) {
 	if (!isSupportState && !storage) {
 		return undefined;
 	}
 
-	let result = getState()[key];
+	let result = getState(hash)[key];
 
 	// some device returns "null" or undefined
 	if (result === "null" || typeof result === "undefined") {
@@ -113,8 +118,8 @@ function getStateByKey(key) {
 /*
  * Set state value
  */
-function setState(state) {
-	const PERSIST_KEY = (location ? location.href : "") + CONST_PERSIST;
+function setState(state, hash) {
+	const PERSIST_KEY = getKey(hash);
 
 	if (storage) {
 		if (state) {
@@ -149,15 +154,15 @@ function setState(state) {
 	state ? window[CONST_PERSIST] = true : delete window[CONST_PERSIST];
 }
 
-function setStateByKey(key, data) {
+function setStateByKey(key, data, hash) {
 	if (!isSupportState && !storage) {
 		return;
 	}
 
-	const beforeData = getState();
+	const beforeData = getState(hash);
 
 	beforeData[key] = data;
-	setState(beforeData);
+	setState(beforeData, hash);
 }
 
 /*
