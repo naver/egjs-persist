@@ -73,9 +73,9 @@ describe("StorageManager", function() {
             expect(data).to.not.exist;
         });
     });
-    describe("location.href with hash", function() {
-        [true, false].forEach(hash => {
-            it(`should check with hash (hash: ${hash})`, () => {
+    describe("location.href with excludeHash", function() {
+        [true, false].forEach(excludeHash => {
+            it(`should check with hash (hash: ${excludeHash})`, () => {
                 // Given
                 var MockStorageManager1 = StorageManagerInjector(
                     {
@@ -102,22 +102,22 @@ describe("StorageManager", function() {
                     }
                 );
                 // When
-                MockStorageManager1.setStateByKey("TEST1", 100, hash);
-                MockStorageManager2.setStateByKey("TEST2", 100, hash);
+                MockStorageManager1.setStateByKey("TEST1", 100, excludeHash);
+                MockStorageManager2.setStateByKey("TEST2", 100, excludeHash);
                 // Then
-                expect(MockStorageManager1.getStateByKey("TEST1", hash)).to.be.equals(100);
-                expect(MockStorageManager2.getStateByKey("TEST2", hash)).to.be.equals(100);
-                if (hash) {
+                expect(MockStorageManager1.getStateByKey("TEST1", excludeHash)).to.be.equals(100);
+                expect(MockStorageManager2.getStateByKey("TEST2", excludeHash)).to.be.equals(100);
+                if (excludeHash) {
+                    // hash: false => MockStorageManager1 has TEST1, TEST2
+                    // hash: false => MockStorageManager2 has TEST1, TEST2
+                    expect(MockStorageManager1.getStateByKey("TEST2", excludeHash)).to.be.equals(100);
+                    expect(MockStorageManager2.getStateByKey("TEST1", excludeHash)).to.be.equals(100);
+                } else {
                     // MockStorageManager1 is different from MockStorageManager2.
                     // hash: true => MockStorageManager1 has TEST1, has not TEST2
                     // hash: true => MockStorageManager2 has TEST2, has not TEST1
-                    expect(MockStorageManager1.getStateByKey("TEST2", hash)).to.be.not.equals(100);
-                    expect(MockStorageManager2.getStateByKey("TEST1", hash)).to.be.not.equals(100);
-                } else {
-                    // hash: false => MockStorageManager1 has TEST1, TEST2
-                    // hash: false => MockStorageManager2 has TEST1, TEST2
-                    expect(MockStorageManager1.getStateByKey("TEST2", hash)).to.be.equals(100);
-                    expect(MockStorageManager2.getStateByKey("TEST1", hash)).to.be.equals(100);
+                    expect(MockStorageManager1.getStateByKey("TEST2", excludeHash)).to.be.not.equals(100);
+                    expect(MockStorageManager2.getStateByKey("TEST1", excludeHash)).to.be.not.equals(100);
                 }
             });
         });

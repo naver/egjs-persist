@@ -39,7 +39,7 @@ class Persist {
 	**/
 	constructor(key) {
 		this.state = {
-			hash: true,
+			excludeHash: false,
 			key: "",
 		};
 
@@ -62,8 +62,8 @@ class Persist {
 	 */
 	get(path) {
 		// find path
-		const {key, hash} = this.state;
-		const globalState =	StorageManager.getStateByKey(key, hash);
+		const {key, excludeHash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, excludeHash);
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -94,16 +94,16 @@ class Persist {
 	 */
 	set(path, value) {
 		// find path
-		const {key, hash} = this.state;
-		const globalState =	StorageManager.getStateByKey(key, hash);
+		const {key, excludeHash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, excludeHash);
 
 		if (path.length === 0) {
-			StorageManager.setStateByKey(key, value, hash);
+			StorageManager.setStateByKey(key, value, excludeHash);
 		} else {
 			StorageManager.setStateByKey(
 				key,
 				setRec(globalState, path.split("."), value),
-				hash
+				excludeHash
 			);
 		}
 
