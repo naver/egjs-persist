@@ -1,4 +1,5 @@
 import {navigator, parseFloat, performance} from "./browser";
+import CONST_PERSIST from "./consts";
 
 const userAgent = navigator ? navigator.userAgent : "";
 const TYPE_BACK_FORWARD = (performance && performance.navigation &&
@@ -27,7 +28,14 @@ function isBackForwardNavigated() {
 		performance.navigation.type) === TYPE_BACK_FORWARD;
 }
 
+function getUrlKey(excludeHash) {
+	const href = location.href;
+
+	return (excludeHash ? href.split("#")[0] : href) + CONST_PERSIST;
+}
+
 export {
+	getUrlKey,
 	isBackForwardNavigated,
 	isNeeded,
 };

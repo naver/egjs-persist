@@ -1,5 +1,5 @@
 import * as StorageManager from "./storageManager";
-import {isNeeded} from "./utils";
+import {isNeeded, getUrlKey} from "./utils";
 import {console} from "./browser";
 
 function setRec(obj, path, value) {
@@ -65,7 +65,8 @@ class Persist {
 	get(path) {
 		// find path
 		const {key, excludeHash} = this.state;
-		const globalState =	StorageManager.getStateByKey(key, excludeHash);
+		const urlKey = getUrlKey(excludeHash);
+		const globalState =	StorageManager.getStateByKey(urlKey, key);
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -87,7 +88,6 @@ class Persist {
 		}
 		return currentItem;
 	}
-
 	/**
 	 * Save value
 	 * @param {String} path target path
@@ -97,15 +97,16 @@ class Persist {
 	set(path, value) {
 		// find path
 		const {key, excludeHash} = this.state;
-		const globalState =	StorageManager.getStateByKey(key, excludeHash);
+		const urlKey = getUrlKey(excludeHash);
+		const globalState =	StorageManager.getStateByKey(urlKey, key);
 
 		if (path.length === 0) {
-			StorageManager.setStateByKey(key, value, excludeHash);
+			StorageManager.setStateByKey(urlKey, key, value);
 		} else {
 			StorageManager.setStateByKey(
+				urlKey,
 				key,
-				setRec(globalState, path.split("."), value),
-				excludeHash
+				setRec(globalState, path.split("."), value)
 			);
 		}
 
