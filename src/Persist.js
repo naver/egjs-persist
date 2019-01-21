@@ -36,6 +36,8 @@ class Persist {
 	/**
 	* Constructor
 	* @param {String | Object} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {String} [key.key]  The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {Boolean} [key.excludeHash] This option can store or get information about url except hash. <ko>이 옵션은 hash를 제외한 url에 대한 정보를 저장화거나 가져올 수 있다.</ko>
 	**/
 	constructor(key) {
 		this.state = {
