@@ -35,10 +35,26 @@ class Persist {
 	static StorageManager = StorageManager;
 	/**
 	* Constructor
-	* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {String | Object} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {String} [key.key]  The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
+	* @param {Boolean} [key.excludeHash] This option can store or get information about url except hash. <ko>이 옵션은 hash를 제외한 url에 대한 정보를 저장화거나 가져올 수 있다.</ko>
 	**/
-	constructor(key, value) {
-		this.key = key;
+	constructor(key) {
+		this.state = {
+			excludeHash: false,
+			key: "",
+		};
+
+		const state = this.state;
+		const keyType = typeof key;
+
+		if (keyType === "string") {
+			state.key = key;
+		} else if (keyType === "object") {
+			for (const name in key) {
+				state[name] = key[name];
+			}
+		}
 	}
 
 	/**
@@ -48,7 +64,8 @@ class Persist {
 	 */
 	get(path) {
 		// find path
-		const globalState =	StorageManager.getStateByKey(this.key);
+		const {key, excludeHash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, excludeHash);
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -79,14 +96,16 @@ class Persist {
 	 */
 	set(path, value) {
 		// find path
-		const globalState =	StorageManager.getStateByKey(this.key);
+		const {key, excludeHash} = this.state;
+		const globalState =	StorageManager.getStateByKey(key, excludeHash);
 
 		if (path.length === 0) {
-			StorageManager.setStateByKey(this.key, value);
+			StorageManager.setStateByKey(key, value, excludeHash);
 		} else {
 			StorageManager.setStateByKey(
-				this.key,
-				setRec(globalState, path.split("."), value)
+				key,
+				setRec(globalState, path.split("."), value),
+				excludeHash
 			);
 		}
 

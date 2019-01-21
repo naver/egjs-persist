@@ -52,6 +52,49 @@ describe("Persist", function() {
     });
 
     describe("Preserve types", function() {
+        beforeEach(() => {
+            location.hash = "";
+            sessionStorage.clear();
+        });
+        it("save number, get number(excludeHash: true)", () => {
+            // Given
+            const persist = new Persist({
+                key: "TESTKEY",
+                excludeHash: true,
+            });
+
+            // When
+            location.hash = "#a";
+            persist.set("test", 10);
+
+            // When you disable hash option, the same value is output.
+            const result1 = persist.get("test");
+            location.hash = "#b";
+            const result2 = persist.get("test");
+
+            // Then
+            expect(result1).to.equal(10);
+            expect(result2).to.equal(10);
+        });
+        it("save number, get number(excludeHash: false)", () => {
+            // Given
+            const persist = new Persist("TESTKEY");
+            persist.set("", null);
+
+            // When
+            persist.set("test", 10);
+            // The value differs when hash option is enabled.
+            const result1 = persist.get("test");
+            location.hash = "#a";
+            const result2 = persist.get("test");
+            location.hash = "#b";
+            const result3 = persist.get("test");
+
+            // Then
+            expect(result1).to.equal(10);
+            expect(result2).to.be.not.ok;
+            expect(result3).to.be.not.ok;
+        });
         it("save number, get number", () => {
             // Given
             const persist = new Persist("TESTKEY");
