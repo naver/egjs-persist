@@ -49,8 +49,8 @@ class Persist {
 		if (keyType === "string") {
 			state.key = key;
 		} else if (keyType === "object") {
-			for (const name in keyType) {
-				state[name] = keyType[name];
+			for (const name in key) {
+				state[name] = key[name];
 			}
 		}
 	}

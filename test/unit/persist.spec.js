@@ -52,6 +52,29 @@ describe("Persist", function() {
     });
 
     describe("Preserve types", function() {
+        beforeEach(() => {
+            location.hash = "";
+        });
+        it("save number, get number(hash: false)", () => {
+            // Given
+            const persist = new Persist({
+                key: "TESTKEY",
+                hash: false,
+            });
+
+            // When
+            location.hash = "#a";
+            persist.set("test", 10);
+
+            // When you disable hash, the same value is output.
+            const result1 = persist.get("test");
+            location.hash = "#b";
+            const result2 = persist.get("test");
+
+            // Then
+            expect(result1).to.equal(10);
+            expect(result2).to.equal(10);
+        });
         it("save number, get number", () => {
             // Given
             const persist = new Persist("TESTKEY");
@@ -59,10 +82,19 @@ describe("Persist", function() {
             const data = 100;
 
             // When
-            persist.set("", data);
+            persist.set("test", data);
+            // The value differs when hash is enabled.
+            const result1 = persist.get("test");
+            location.hash = "#a";
+            const result2 = persist.get("test");
+            location.hash = "#b";
+            const result3 = persist.get("test");
+
 
             // Then
-            expect(persist.get("")).to.equal(data);
+            expect(result1).to.equal(data);
+            expect(result2).to.be.not.ok;
+            expect(result3).to.be.not.ok;
         });
 
         it("save string data, get string data", () => {
