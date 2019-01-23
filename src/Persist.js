@@ -75,6 +75,18 @@ function addDepth(currentUrl) {
 		StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL, currentUrl);
 	}
 }
+function clear() {
+	const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+
+	depths.forEach(url => {
+		StorageManager.reset(getKey(url), null);
+	});
+
+	StorageManager.reset(CONST_PERSIST_STATE, null);
+
+	Persist.url = "";
+	Persist[CONST_CURRENT_URL] = "";
+}
 if (window.onpopstate) {
 	window.addEventListener("popstate", () => {
 		// popstate event occurs when backward or forward
@@ -94,6 +106,21 @@ class Persist {
 	static StorageManager = StorageManager;
 	static url = "";
 	static [CONST_CURRENT_URL] = "";
+	/**
+	 * @static
+	 * Clear all information in Persist
+	 */
+	static clear() {
+		clear();
+	}
+	/**
+	 * @static
+	 * Return whether you need "Persist" module by checking the bfCache support of the current browser
+	 * @return {Boolean}
+	 */
+	static isNeeded() {
+		return isNeeded;
+	}
 	/**
 	* Constructor
 	* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
@@ -166,15 +193,6 @@ class Persist {
 		// If you are using set method, add the current url to depth.
 		addDepth(url);
 		return this;
-	}
-
-	/**
-	 * @static
-	 * Return whether you need "Persist" module by checking the bfCache support of the current browser
-	 * @return {Boolean}
-	 */
-	static isNeeded() {
-		return isNeeded;
 	}
 }
 
