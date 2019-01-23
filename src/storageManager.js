@@ -40,10 +40,6 @@ function warnInvalidStorageValue() {
 	/* eslint-enable no-console */
 }
 
-function getStorageKey() {
-	return storage ? location.href + CONST_PERSIST : undefined;
-}
-
 function getStorage() {
 	return storage;
 }
@@ -167,6 +163,5 @@ export {
 	reset,
 	setStateByKey,
 	getStateByKey,
-	getStorageKey,
 	getStorage,
 };
