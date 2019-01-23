@@ -87,7 +87,7 @@ export function clear() {
 	Persist.url = "";
 	Persist[CONST_CURRENT_URL] = "";
 }
-if (window.onpopstate) {
+if ("onpopstate" in window) {
 	window.addEventListener("popstate", () => {
 		// popstate event occurs when backward or forward
 		updateDepth(getUrl(), TYPE_BACK_FORWARD);
@@ -126,7 +126,7 @@ class Persist {
 	* @param {String} key The key of the state information to be stored <ko>저장할 상태 정보의 키</ko>
 	**/
 	constructor(key) {
-		this.key = key;
+		this.key = key || "";
 	}
 
 	/**

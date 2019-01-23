@@ -29,6 +29,7 @@ module.exports = config => {
 									{
 										"loose": true,
 										"modules": "commonjs",
+										"targets": {"chrome": "55"},
 									},
 								],
 							],
