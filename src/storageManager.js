@@ -1,6 +1,5 @@
 import {window, history, location, sessionStorage, localStorage} from "./browser";
-import {isBackForwardNavigated} from "./utils";
-import CONST_PERSIST from "./consts";
+import {CONST_PERSIST} from "./consts";
 
 const isSupportState = history && "replaceState" in history && "state" in history;
 
@@ -160,12 +159,9 @@ function setStateByKey(key, valueKey, data) {
 /*
  * flush current history state
  */
-function reset() {
-	setState(null);
+function reset(key) {
+	setState(key, null);
 }
-
-// in case of reload
-!isBackForwardNavigated() && reset();
 
 export {
 	reset,
