@@ -25,15 +25,16 @@ function getNavigationType() {
 	return performance && performance.navigation &&
 		performance.navigation.type;
 }
-
-function getUrlKey(excludeHash) {
-	const href = location.href;
-
-	return (excludeHash ? href.split("#")[0] : href) + CONST_PERSIST;
+function getUrl() {
+	return location.href.split("#")[0];
+}
+function getKey(name) {
+	return name + CONST_PERSIST;
 }
 
 export {
-	getUrlKey,
+	getUrl,
+	getKey,
 	getNavigationType,
 	isNeeded,
 };
