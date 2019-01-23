@@ -25,7 +25,7 @@ function setRec(obj, path, value) {
 	return _obj;
 }
 
-function updateDepth(currentUrl, type) {
+export function updateDepth(currentUrl, type) {
 	const prevUrl = Persist.url;
 
 	if (prevUrl !== currentUrl) {
@@ -60,7 +60,7 @@ function updateDepth(currentUrl, type) {
 		}
 	}
 }
-function addDepth(currentUrl) {
+export function addDepth(currentUrl) {
 	const prevUrl = Persist[CONST_CURRENT_URL];
 
 	if (currentUrl !== prevUrl) {
@@ -75,7 +75,7 @@ function addDepth(currentUrl) {
 		StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL, currentUrl);
 	}
 }
-function clear() {
+export function clear() {
 	const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
 
 	depths.forEach(url => {

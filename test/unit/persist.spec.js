@@ -34,12 +34,36 @@ describe("Persist", function() {
         });
     });
 
+    describe("clear", function() {
+        it("call clear", () => {
+            // Given
+            // first clear
+            Persist.clear();
+
+            // save value
+            const persist = new Persist();
+            persist.set("test", 100);
+
+            // exist value
+            const value = persist.get("test");
+            // When
+
+            // remove all
+            Persist.clear();
+
+            // not exist value
+            const value2 = persist.get("test");
+            // Then
+            expect(value).to.be.equal(100);
+            expect(value2).to.be.not.ok;
+        });
+    });
     describe("History", function() {
         it("save index, get index when history.state is null", () => {
             // Given
             history.replaceState(null,null,null);
             expect(history.state).to.equal(null);
-            const persist = new PersistUsingHistory("TESTKEY");
+            const persist = new PersistUsingHistory.default("TESTKEY");
             
             // When
             persist.set("flick", {
@@ -55,45 +79,6 @@ describe("Persist", function() {
         beforeEach(() => {
             location.hash = "";
             sessionStorage.clear();
-        });
-        it("save number, get number(excludeHash: true)", () => {
-            // Given
-            const persist = new Persist({
-                key: "TESTKEY",
-                excludeHash: true,
-            });
-
-            // When
-            location.hash = "#a";
-            persist.set("test", 10);
-
-            // When you disable hash option, the same value is output.
-            const result1 = persist.get("test");
-            location.hash = "#b";
-            const result2 = persist.get("test");
-
-            // Then
-            expect(result1).to.equal(10);
-            expect(result2).to.equal(10);
-        });
-        it("save number, get number(excludeHash: false)", () => {
-            // Given
-            const persist = new Persist("TESTKEY");
-            persist.set("", null);
-
-            // When
-            persist.set("test", 10);
-            // The value differs when hash option is enabled.
-            const result1 = persist.get("test");
-            location.hash = "#a";
-            const result2 = persist.get("test");
-            location.hash = "#b";
-            const result3 = persist.get("test");
-
-            // Then
-            expect(result1).to.equal(10);
-            expect(result2).to.be.not.ok;
-            expect(result3).to.be.not.ok;
         });
         it("save number, get number", () => {
             // Given
@@ -382,12 +367,15 @@ describe("Persist", function() {
                                 warn: function() {
                                     warnCalled = true;
                                 }
-                            }
+                            },
+                            window: {
+
+                            },
                         }
                     }
                 );
 
-                const persist = new MockedPersist("TESTKEY");
+                const persist = new MockedPersist.default("TESTKEY");
                 persist.set("", null);
                 persist.set("0", { "name": "john" });
 
