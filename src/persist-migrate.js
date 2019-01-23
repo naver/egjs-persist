@@ -1,5 +1,6 @@
 /* eslint-disable */
 import {window} from "./browser";
+import { getKey, getUrl } from "./utils";
 
 export default (function(eg) {
 	if (!eg || !eg.Persist) {
@@ -12,28 +13,28 @@ export default (function(eg) {
 	var StorageManager = eg.Persist.StorageManager;
 
 	eg.Persist = function Persist(key, value) {
+		const urlKey = getKey(getUrl());
 		// when called as plain method
 		if (!(this instanceof Persist)) {
 			if (arguments.length === 0) {
-				return StorageManager.getStateByKey(GLOBAL_KEY);
+				return StorageManager.getStateByKey(urlKey, GLOBAL_KEY);
 			}
 
 			if (arguments.length === 1 && typeof key !== "string") {
 				var value_ = key;
 
-				StorageManager.setStateByKey(GLOBAL_KEY, value_);
+				StorageManager.setStateByKey(urlKey, GLOBAL_KEY, value_);
 				return undefined;
 			}
 
 			if (arguments.length === 2) {
-				StorageManager.setStateByKey(key, value);
+				StorageManager.setStateByKey(urlKey, key, value);
 			}
 
-			return StorageManager.getStateByKey(key);
+			return StorageManager.getStateByKey(urlKey, key);
 		}
 
 		// when called as constructer
-		this.state = {key, excludeHash: false};
 		this.key = key;
 		return undefined;
 	};
