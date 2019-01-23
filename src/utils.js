@@ -1,5 +1,5 @@
 import {navigator, parseFloat, performance} from "./browser";
-import { CONST_PERSIST } from "./consts";
+import {CONST_PERSIST} from "./consts";
 
 const userAgent = navigator ? navigator.userAgent : "";
 
