@@ -626,19 +626,25 @@ describe("Persist", function() {
             const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             // Then
+            // start
             expect(value1).to.be.equals(1);
             expect(length1).to.be.equals(1);
             expect(currentUrl1.lastIndexOf(pathname)).to.be.equals(currentUrl1.length - pathname.length);
 
+            // a
             expect(value2).to.be.equals(2);
             expect(length2).to.be.equals(2);
             expect(currentUrl2.lastIndexOf("a")).to.be.equals(currentUrl2.length - 1);
 
-            expect(value3).to.be.equals(1);
+            // start(back)
+            // same value1
+            expect(value3).to.be.equals(value1);
             expect(length3).to.be.equals(2);
             expect(currentUrl3.lastIndexOf(pathname)).to.be.equals(currentUrl1.length - pathname.length);
 
-            expect(value4).to.be.equals(2);
+            // a (forward)
+            // same value2
+            expect(value4).to.be.equals(value2);
             expect(length4).to.be.equals(2);
             expect(currentUrl4.lastIndexOf("a")).to.be.equals(currentUrl2.length - 1);
         });
