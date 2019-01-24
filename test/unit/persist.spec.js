@@ -573,9 +573,11 @@ describe("Persist", function() {
                     },
                 }
             );
+            // start -> a(x) -> b
             const depths1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
 
             persist.set("c", 1);
+            // start -> b -> a(new)
             const depths2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);            
             const length1 = depths1.length;
             const length2 = depths2.length;
@@ -586,9 +588,14 @@ describe("Persist", function() {
 
             // start
             expect(depths1[0].lastIndexOf(pathname)).to.be.equals(depths1[0].length - pathname.length);
+            // a
             expect(depths1[1].lastIndexOf("b")).to.be.equals(depths1[1].length - 1);
+
+            // start
             expect(depths2[0].lastIndexOf(pathname)).to.be.equals(depths2[0].length - pathname.length);
+            // b
             expect(depths2[1].lastIndexOf("b")).to.be.equals(depths2[1].length - 1);
+            // a
             expect(depths2[2].lastIndexOf("a")).to.be.equals(depths2[2].length - 1);
         });
         it("test depth start -> a -> start(back) -> a(forward)", async () => {
