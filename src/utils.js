@@ -1,8 +1,7 @@
 import {navigator, parseFloat, performance} from "./browser";
+import {CONST_PERSIST} from "./consts";
 
 const userAgent = navigator ? navigator.userAgent : "";
-const TYPE_BACK_FORWARD = (performance && performance.navigation &&
-	performance.navigation.TYPE_BACK_FORWARD) || 2;
 
 const isNeeded = (function() {
 	const isIOS = (new RegExp("iPhone|iPad", "i")).test(userAgent);
@@ -22,12 +21,20 @@ const isNeeded = (function() {
 })();
 
 // In case of IE8, TYPE_BACK_FORWARD is undefined.
-function isBackForwardNavigated() {
-	return (performance && performance.navigation &&
-		performance.navigation.type) === TYPE_BACK_FORWARD;
+function getNavigationType() {
+	return performance && performance.navigation &&
+		performance.navigation.type;
+}
+function getUrl() {
+	return location.href.split("#")[0];
+}
+function getStorageKey(name) {
+	return name + CONST_PERSIST;
 }
 
 export {
-	isBackForwardNavigated,
+	getUrl,
+	getStorageKey,
+	getNavigationType,
 	isNeeded,
 };

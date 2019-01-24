@@ -1,6 +1,5 @@
 import {window, history, location, sessionStorage, localStorage} from "./browser";
-import {isBackForwardNavigated} from "./utils";
-import CONST_PERSIST from "./consts";
+import {CONST_PERSIST} from "./consts";
 
 const isSupportState = history && "replaceState" in history && "state" in history;
 
@@ -41,32 +40,22 @@ function warnInvalidStorageValue() {
 	/* eslint-enable no-console */
 }
 
-function getStorageKey() {
-	return storage ? location.href + CONST_PERSIST : undefined;
-}
-
 function getStorage() {
 	return storage;
 }
 
-function getKey(excludeHash) {
-	const href = location.href;
-
-	return (excludeHash ? href.split("#")[0] : href) + CONST_PERSIST;
-}
 /*
  * Get state value
  */
-function getState(excludeHash) {
-	const PERSIST_KEY = getKey(excludeHash);
+function getState(key) {
 	let state;
 	let stateStr;
 
 	if (storage) {
-		stateStr = storage.getItem(PERSIST_KEY);
+		stateStr = storage.getItem(key);
 	} else if (history.state) {
 		if (typeof history.state === "object" && history.state !== null) {
-			stateStr = history.state[PERSIST_KEY];
+			stateStr = history.state[key];
 		} else {
 			warnInvalidStorageValue();
 		}
@@ -101,12 +90,12 @@ function getState(excludeHash) {
 	return state;
 }
 
-function getStateByKey(key, excludeHash) {
+function getStateByKey(key, valueKey) {
 	if (!isSupportState && !storage) {
 		return undefined;
 	}
 
-	let result = getState(excludeHash)[key];
+	let result = getState(key)[valueKey];
 
 	// some device returns "null" or undefined
 	if (result === "null" || typeof result === "undefined") {
@@ -118,22 +107,20 @@ function getStateByKey(key, excludeHash) {
 /*
  * Set state value
  */
-function setState(state, excludeHash) {
-	const PERSIST_KEY = getKey(excludeHash);
-
+function setState(key, state) {
 	if (storage) {
 		if (state) {
 			storage.setItem(
-				PERSIST_KEY, JSON.stringify(state));
+				key, JSON.stringify(state));
 		} else {
-			storage.removeItem(PERSIST_KEY);
+			storage.removeItem(key);
 		}
 	} else {
 		try {
 			const historyState = !history || history.state == null ? {} : history.state;
 
 			if (history && typeof historyState === "object") {
-				historyState[PERSIST_KEY] = JSON.stringify(state);
+				historyState[key] = JSON.stringify(state);
 				history.replaceState(
 					historyState,
 					document.title,
@@ -154,31 +141,27 @@ function setState(state, excludeHash) {
 	state ? window[CONST_PERSIST] = true : delete window[CONST_PERSIST];
 }
 
-function setStateByKey(key, data, excludeHash) {
+function setStateByKey(key, valueKey, data) {
 	if (!isSupportState && !storage) {
 		return;
 	}
 
-	const beforeData = getState(excludeHash);
+	const beforeData = getState(key);
 
-	beforeData[key] = data;
-	setState(beforeData, excludeHash);
+	beforeData[valueKey] = data;
+	setState(key, beforeData);
 }
 
 /*
  * flush current history state
  */
-function reset() {
-	setState(null);
+function reset(key) {
+	setState(key, null);
 }
-
-// in case of reload
-!isBackForwardNavigated() && reset();
 
 export {
 	reset,
 	setStateByKey,
 	getStateByKey,
-	getStorageKey,
 	getStorage,
 };

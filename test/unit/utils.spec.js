@@ -109,10 +109,10 @@ describe("utils", function() {
             );
 
             // When
-            const isBackForwardNavigated = MockUtils.isBackForwardNavigated();
+            const navigationType = MockUtils.getNavigationType();
 
             // Then
-            expect(isBackForwardNavigated).is.ok;
+            expect(navigationType).is.equals(2);
         });
 
         it(`should return false, when refresh/address navigated`, () => {
@@ -137,10 +137,10 @@ describe("utils", function() {
             );
 
             // When
-            const isBackForwardNavigated = MockUtils.isBackForwardNavigated();
+            const navigationType = MockUtils.getNavigationType();
 
             // Then
-            expect(isBackForwardNavigated).is.not.ok;
+            expect(navigationType).is.equals(1);
         });
 
         it(`should not throw error on iOS 7`, () => {
@@ -159,7 +159,7 @@ describe("utils", function() {
                         }
                     }
                 );
-                MockUtils.isBackForwardNavigated();
+                MockUtils.getNavigationType();
             } catch (e) {
                 debugger;
                 isErrorThrown = true;
@@ -189,7 +189,7 @@ describe("utils", function() {
                         }
                     }
                 );
-                MockUtils.isBackForwardNavigated();
+                MockUtils.getNavigationType();
             } catch (e) {
                 isErrorThrown = true;
             }

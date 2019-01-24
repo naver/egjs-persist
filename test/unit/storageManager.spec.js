@@ -1,61 +1,27 @@
 /* eslint-disable */
 import * as StorageManager from "../../src/storageManager";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
+import { getUrl, getStorageKey } from "../../src/utils";
+
+const KEY = getStorageKey(getUrl());
 
 describe("StorageManager", function() {
-    describe("reset when initialize", function() {
-        it("Should call reset when no BACK/FORWARD navigated", () => {
-            // Given
-            StorageManager.setStateByKey("TEST", 100);
-
-            // When
-            var MockStorageManager = StorageManagerInjector(
-                {
-                    "./utils": {
-                        isBackForwardNavigated: () => false
-                    }
-                }
-            );
-
-            // Then
-            expect(StorageManager.getStateByKey("TEST")).is.not.exist;
-        });
-
-        it("Should not call reset when BACK/FORWARD navigated", () => {
-            // Given
-            StorageManager.setStateByKey("TEST", 100);
-
-            // When
-            var MockStorageManager = StorageManagerInjector(
-                {
-                    "./utils": {
-                        isBackForwardNavigated: () => true
-                    }
-                }
-            );
-
-            // Then
-            expect(StorageManager.getStateByKey("TEST")).is.exist;
-        });
-    });
-
     describe("getter setter", function() {
         it("#setStateByKey", () => {
             // Given
-
             // When
-            StorageManager.setStateByKey("TEST", 100);
+            StorageManager.setStateByKey(KEY, "TEST", 100);
 
             // Then
-            expect(StorageManager.getStateByKey("TEST")).to.equal(100);
+            expect(StorageManager.getStateByKey(KEY, "TEST")).to.equal(100);
         });
 
         it("#getStateByKey", () => {
             // Given
-            StorageManager.setStateByKey("TEST", 100);
+            StorageManager.setStateByKey(KEY, "TEST", 100);
 
             // When
-            const data = StorageManager.getStateByKey("TEST");
+            const data = StorageManager.getStateByKey(KEY, "TEST");
 
             // Then
             expect(data).to.equal(100);
@@ -63,92 +29,41 @@ describe("StorageManager", function() {
 
         it("#reset", () => {
             // Given
-            StorageManager.setStateByKey("TEST", 100);
+            StorageManager.setStateByKey(KEY, "TEST", 100);
 
             // When
-            StorageManager.reset();
+            StorageManager.reset(KEY);
 
             // Then
-            const data = StorageManager.getStateByKey("TEST");
+            const data = StorageManager.getStateByKey(KEY, "TEST");
             expect(data).to.not.exist;
-        });
-    });
-    describe("location.href with excludeHash", function() {
-        [true, false].forEach(excludeHash => {
-            it(`should check with hash (hash: ${excludeHash})`, () => {
-                // Given
-                var MockStorageManager1 = StorageManagerInjector(
-                    {
-                        "./browser": {
-                            location: {
-                                href: "a#hash"
-                            },
-                            history: window.history,
-                            sessionStorage: window.sessionStorage,
-                            window: window
-                        }
-                    }
-                );
-                var MockStorageManager2 = StorageManagerInjector(
-                    {
-                        "./browser": {
-                            location: {
-                                href: "a"
-                            },
-                            history: window.history,
-                            sessionStorage: window.sessionStorage,
-                            window: window
-                        }
-                    }
-                );
-                // When
-                MockStorageManager1.setStateByKey("TEST1", 100, excludeHash);
-                MockStorageManager2.setStateByKey("TEST2", 100, excludeHash);
-                // Then
-                expect(MockStorageManager1.getStateByKey("TEST1", excludeHash)).to.be.equals(100);
-                expect(MockStorageManager2.getStateByKey("TEST2", excludeHash)).to.be.equals(100);
-                if (excludeHash) {
-                    // hash: false => MockStorageManager1 has TEST1, TEST2
-                    // hash: false => MockStorageManager2 has TEST1, TEST2
-                    expect(MockStorageManager1.getStateByKey("TEST2", excludeHash)).to.be.equals(100);
-                    expect(MockStorageManager2.getStateByKey("TEST1", excludeHash)).to.be.equals(100);
-                } else {
-                    // MockStorageManager1 is different from MockStorageManager2.
-                    // hash: true => MockStorageManager1 has TEST1, has not TEST2
-                    // hash: true => MockStorageManager2 has TEST2, has not TEST1
-                    expect(MockStorageManager1.getStateByKey("TEST2", excludeHash)).to.be.not.equals(100);
-                    expect(MockStorageManager2.getStateByKey("TEST1", excludeHash)).to.be.not.equals(100);
-                }
-            });
         });
     });
     describe("storage usage control", function() {
         it("Resetting should remove storage usage", () => {
             // Given
-            const storageKey = StorageManager.getStorageKey();
             const storage = StorageManager.getStorage();
-            StorageManager.setStateByKey("TEST", 100);
+            StorageManager.setStateByKey(KEY, "TEST", 100);
 
             // When
-            StorageManager.reset();
+            StorageManager.reset(KEY);
 
             // Then
-            const storageValue = storage.getItem(storageKey);
+            const storageValue = storage.getItem(KEY);
             expect(storageValue).to.not.exist;
         });
 
         it("Removing values should reduce storage usage", () => {
             // Given
-            const storageKey = StorageManager.getStorageKey();
             const storage = StorageManager.getStorage();
-            StorageManager.setStateByKey("TEST", 100);
-            const prvStorageSize = storage.getItem(storageKey).length;
+            StorageManager.setStateByKey(KEY, "TEST", 100);
+            const prvStorageSize = storage.getItem(KEY).length;
 
             // When
-            StorageManager.setStateByKey("TEST", undefined);
+            StorageManager.setStateByKey(KEY, "TEST", undefined);
 
             // Then
-            const curStorageSize = storage.getItem(storageKey).length;
+            const curStorageSize = storage.getItem(KEY).length;
             expect(prvStorageSize > curStorageSize).to.be.ok;
         });
     });
@@ -214,7 +129,7 @@ describe("StorageManager", function() {
         storageValues.forEach(storageVal => {
             it("show warning and no error with storage value: " + storageVal, () => {
                 // Given
-                StorageManager.getStorage().setItem(StorageManager.getStorageKey(), storageVal);
+                StorageManager.getStorage().setItem(KEY, storageVal);
                 let errorThrown = false;
                 let warningShown = false;
                 console.warn = function () {
@@ -224,9 +139,6 @@ describe("StorageManager", function() {
                 // When
                 try {
                     let MockStorageManager = StorageManagerInjector({
-                        "./utils": {
-                            isBackForwardNavigated: () => true
-                        },
                         "./browser": {
                             sessionStorage: sessionStorage,
                             localStorage: localStorage,
@@ -236,7 +148,7 @@ describe("StorageManager", function() {
                             window: window
                         }
                     });
-                    MockStorageManager.getStateByKey("TEST");
+                    MockStorageManager.getStateByKey(KEY, "TEST");
                 } catch (e) {
                     errorThrown = true;
                 }
