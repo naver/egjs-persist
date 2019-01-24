@@ -1,8 +1,16 @@
 /* eslint-disable no-use-before-define */
-import * as StorageManager from "./storageManager";
-import {isNeeded, getUrl, getKey, getNavigationType} from "./utils";
+import {
+	reset,
+	setStateByKey,
+	getStateByKey,
+	getStorage,
+} from "./storageManager";
+import {isNeeded, getUrl, getStorageKey, getNavigationType} from "./utils";
 import {console, window} from "./browser";
-import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_CURRENT_URL} from "./consts";
+import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "./consts";
+
+let lastUrl = "";
+let currentUrl = "";
 
 function setRec(obj, path, value) {
 	let _obj = obj;
@@ -25,67 +33,64 @@ function setRec(obj, path, value) {
 	return _obj;
 }
 
-export function updateDepth(currentUrl, type) {
-	const prevUrl = Persist.url;
-
-	if (prevUrl !== currentUrl) {
-		Persist.url = currentUrl;
-		const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+function updateDepth(url, type) {
+	if (currentUrl !== url) {
+		currentUrl = url;
+		const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
 
 		if (type === TYPE_BACK_FORWARD) {
 			// Change current url only
 			const currentIndex = depths.indexOf(currentUrl);
 
 			if (~currentIndex) {
-				StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL, currentUrl);
+				lastUrl = currentUrl;
+				setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, lastUrl);
 			}
 		} else {
-			const current = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+			const prevLastUrl = getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
-			StorageManager.reset(getKey(currentUrl), null);
+			reset(getStorageKey(currentUrl), null);
 			if (type === TYPE_NAVIGATE) {
 				// Remove all url lists with higher index than current index
-				const prevIndex = depths.indexOf(current);
-				const removedList = depths.splice(prevIndex + 1, depths.length);
+				const prevLastIndex = depths.indexOf(prevLastUrl);
+				const removedList = depths.splice(prevLastIndex + 1, depths.length);
 
-				removedList.forEach(url => {
-					StorageManager.reset(getKey(url), null);
+				removedList.forEach(removedUrl => {
+					reset(getStorageKey(removedUrl), null);
 				});
 				// If the type is NAVIGATE and there is information about current url, delete it.
 				const currentIndex = depths.indexOf(currentUrl);
 
 				~currentIndex && depths.splice(currentIndex, 1);
-				StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
+				setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
 			}
 		}
 	}
 }
-export function addDepth(currentUrl) {
-	const prevUrl = Persist[CONST_CURRENT_URL];
+function addDepth(url) {
+	if (url !== lastUrl) {
+		lastUrl = url;
 
-	if (currentUrl !== prevUrl) {
-		Persist[CONST_CURRENT_URL] = currentUrl;
+		const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
 
-		const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
-
-		if (depths.indexOf(currentUrl) < 0) {
-			depths.push(currentUrl);
-			StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
+		if (depths.indexOf(lastUrl) < 0) {
+			depths.push(lastUrl);
+			setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
 		}
-		StorageManager.setStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL, currentUrl);
+		setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, lastUrl);
 	}
 }
-export function clear() {
-	const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+function clear() {
+	const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
 
 	depths.forEach(url => {
-		StorageManager.reset(getKey(url), null);
+		reset(getStorageKey(url), null);
 	});
 
-	StorageManager.reset(CONST_PERSIST_STATE, null);
+	reset(CONST_PERSIST_STATE, null);
 
-	Persist.url = "";
-	Persist[CONST_CURRENT_URL] = "";
+	currentUrl = "";
+	lastUrl = "";
 }
 if ("onpopstate" in window) {
 	window.addEventListener("popstate", () => {
@@ -103,9 +108,12 @@ if ("onpopstate" in window) {
  */
 class Persist {
 	static VERSION = "#__VERSION__#";
-	static StorageManager = StorageManager;
-	static url = "";
-	static [CONST_CURRENT_URL] = "";
+	static StorageManager = {
+		reset,
+		setStateByKey,
+		getStateByKey,
+		getStorage,
+	};
 	/**
 	 * @static
 	 * Clear all information in Persist
@@ -136,12 +144,12 @@ class Persist {
 	 */
 	get(path) {
 		const url = getUrl();
-		const urlKey = getKey(url);
+		const urlKey = getStorageKey(url);
 
 		// update url for pushState, replaceState
 		updateDepth(url, TYPE_NAVIGATE);
 		// find path
-		const globalState =	StorageManager.getStateByKey(urlKey, this.key);
+		const globalState =	getStateByKey(urlKey, this.key);
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -171,19 +179,19 @@ class Persist {
 	 */
 	set(path, value) {
 		const url = getUrl();
-		const urlKey = getKey(url);
+		const urlKey = getStorageKey(url);
 
 		// update url for pushState, replaceState
 		updateDepth(url, TYPE_NAVIGATE);
 
 		// find path
 		const key = this.key;
-		const globalState =	StorageManager.getStateByKey(urlKey, key);
+		const globalState =	getStateByKey(urlKey, key);
 
 		if (path.length === 0) {
-			StorageManager.setStateByKey(urlKey, key, value);
+			setStateByKey(urlKey, key, value);
 		} else {
-			StorageManager.setStateByKey(
+			setStateByKey(
 				urlKey,
 				key,
 				setRec(globalState, path.split("."), value)

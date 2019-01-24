@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {window} from "./browser";
-import { getKey, getUrl } from "./utils";
+import { getStorageKey, getUrl } from "./utils";
 
 export default (function(eg) {
 	if (!eg || !eg.Persist) {
@@ -13,7 +13,7 @@ export default (function(eg) {
 	var StorageManager = eg.Persist.StorageManager;
 
 	eg.Persist = function Persist(key, value) {
-		const urlKey = getKey(getUrl());
+		const urlKey = getStorageKey(getUrl());
 		// when called as plain method
 		if (!(this instanceof Persist)) {
 			if (arguments.length === 0) {

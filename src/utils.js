@@ -28,13 +28,13 @@ function getNavigationType() {
 function getUrl() {
 	return location.href.split("#")[0];
 }
-function getKey(name) {
+function getStorageKey(name) {
 	return name + CONST_PERSIST;
 }
 
 export {
 	getUrl,
-	getKey,
+	getStorageKey,
 	getNavigationType,
 	isNeeded,
 };

@@ -3,7 +3,7 @@ import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
-import { CONST_PERSIST_STATE, CONST_DEPTHS, CONST_CURRENT_URL } from "../../src/consts";
+import { CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL } from "../../src/consts";
 import {wait} from "./TestHelper";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
@@ -68,7 +68,7 @@ describe("Persist", function() {
             // Given
             history.replaceState(null,null,null);
             expect(history.state).to.equal(null);
-            const persist = new PersistUsingHistory.default("TESTKEY");
+            const persist = new PersistUsingHistory("TESTKEY");
             
             // When
             persist.set("flick", {
@@ -85,6 +85,26 @@ describe("Persist", function() {
             location.hash = "";
             sessionStorage.clear();
         });
+        it("save number, get number(hash is all different)", () => {
+        // Given
+        const persist = new Persist({
+            key: "TESTKEY",
+            excludeHash: true,
+        });
+
+        // When
+        location.hash = "#a";
+        persist.set("test", 10);
+
+        // the same value is output.
+        const result1 = persist.get("test");
+        location.hash = "#b";
+        const result2 = persist.get("test");
+
+        // Then
+        expect(result1).to.equal(10);
+        expect(result2).to.equal(10);
+    });
         it("save number, get number", () => {
             // Given
             const persist = new Persist("TESTKEY");
@@ -380,7 +400,7 @@ describe("Persist", function() {
                     }
                 );
 
-                const persist = new MockedPersist.default("TESTKEY");
+                const persist = new MockedPersist("TESTKEY");
                 persist.set("", null);
                 persist.set("0", { "name": "john" });
 
@@ -486,29 +506,30 @@ describe("Persist", function() {
             const persist = new Persist();
 
             // When
-            const prevUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const prevUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
             persist.set("0", 1);
             const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             history.pushState({}, "", "/a");
-            const prevUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const prevUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
             persist.set("a", 1);
             const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             history.pushState({}, "", "/b");
-            const prevUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const prevUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
             persist.set("b", 1);
             const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             history.pushState({}, "", "/c");
-            const prevUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const prevUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
             persist.set("c", 1);
             const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
+            // Then
             expect(length1).to.be.equals(1);
             expect(length2).to.be.equals(2);
             expect(length3).to.be.equals(3);
@@ -524,6 +545,52 @@ describe("Persist", function() {
             expect(currentUrl3).to.be.equals(prevUrl4);
             expect(currentUrl4.lastIndexOf("c")).to.be.equals(currentUrl4.length - 1);
         });
+        it("test depth start -> a -> b -> a(new)", () => {
+            // Given
+            const persist = new Persist();
+
+            // When
+            // start
+            persist.set("0", 1);
+
+            // a
+            history.pushState({}, "", "/a");
+            persist.set("a", 1);
+
+            // b
+            history.pushState({}, "", "/b");
+            persist.set("b", 1);
+
+            // a (new)
+            history.pushState({}, "", "/a");
+            
+            // remove (a) information
+            PersistInjector(
+                {
+                    "./utils": {
+                        ...utils,
+                        getNavigationType: () => 0,
+                    },
+                }
+            );
+            const depths1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
+
+            persist.set("c", 1);
+            const depths2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);            
+            const length1 = depths1.length;
+            const length2 = depths2.length;
+
+            // Then
+            expect(length1).to.be.equals(2);
+            expect(length2).to.be.equals(3);
+
+            // start
+            expect(depths1[0].lastIndexOf(pathname)).to.be.equals(depths1[0].length - pathname.length);
+            expect(depths1[1].lastIndexOf("b")).to.be.equals(depths1[1].length - 1);
+            expect(depths2[0].lastIndexOf(pathname)).to.be.equals(depths2[0].length - pathname.length);
+            expect(depths2[1].lastIndexOf("b")).to.be.equals(depths2[1].length - 1);
+            expect(depths2[2].lastIndexOf("a")).to.be.equals(depths2[2].length - 1);
+        });
         it("test depth start -> a -> start(back) -> a(forward)", async () => {
             // Given
             const persist = new Persist();
@@ -533,14 +600,14 @@ describe("Persist", function() {
             persist.set("value", 1);
             const value1 = persist.get("value");
             const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             // a
             history.pushState({}, "", "/a");
             persist.set("value", 2);
             const value2 = persist.get("value");
             const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             // start (back)
             history.go(-1);
@@ -548,7 +615,7 @@ describe("Persist", function() {
 
             const value3 = persist.get("value");
             const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
             // a (forward)
             history.go(1);
@@ -556,8 +623,9 @@ describe("Persist", function() {
 
             const value4 = persist.get("value");
             const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
-            const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_CURRENT_URL);
+            const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
+            // Then
             expect(value1).to.be.equals(1);
             expect(length1).to.be.equals(1);
             expect(currentUrl1.lastIndexOf(pathname)).to.be.equals(currentUrl1.length - pathname.length);
@@ -641,12 +709,12 @@ describe("Persist", function() {
             const value2 = persist.get("value");
             const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
+            // Then
             expect(value1).to.be.equals(1);
             expect(length1).to.be.equals(3);
 
             expect(value2).to.be.not.ok;
             expect(length2).to.be.equals(3);
-            // Then
         })
     });
 });

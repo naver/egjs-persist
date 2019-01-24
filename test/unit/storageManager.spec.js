@@ -1,9 +1,9 @@
 /* eslint-disable */
 import * as StorageManager from "../../src/storageManager";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
-import { getUrl, getKey } from "../../src/utils";
+import { getUrl, getStorageKey } from "../../src/utils";
 
-const KEY = getKey(getUrl());
+const KEY = getStorageKey(getUrl());
 
 describe("StorageManager", function() {
     describe("getter setter", function() {

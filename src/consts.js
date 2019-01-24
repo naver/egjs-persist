@@ -3,7 +3,7 @@ import {performance} from "./browser";
 export const CONST_PERSIST = "___persist___";
 export const CONST_PERSIST_STATE = `state${CONST_PERSIST}`;
 export const CONST_DEPTHS = "depths";
-export const CONST_CURRENT_URL = "currentUrl";
+export const CONST_LAST_URL = "lastUrl";
 const navigation = performance && performance.navigation;
 
 export const TYPE_NAVIGATE = (navigation && navigation.TYPE_NAVIGATE) || 0;
