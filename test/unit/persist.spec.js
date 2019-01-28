@@ -573,7 +573,7 @@ describe("Persist", function() {
                     },
                 }
             );
-            // start -> a(x) -> b
+            // start -> a(x) -> b -> a
             const depths1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
 
             persist.set("c", 1);
@@ -583,13 +583,15 @@ describe("Persist", function() {
             const length2 = depths2.length;
 
             // Then
-            expect(length1).to.be.equals(2);
+            expect(length1).to.be.equals(3);
             expect(length2).to.be.equals(3);
 
             // start
             expect(depths1[0].lastIndexOf(pathname)).to.be.equals(depths1[0].length - pathname.length);
-            // a
+            // b
             expect(depths1[1].lastIndexOf("b")).to.be.equals(depths1[1].length - 1);
+            // a
+            expect(depths1[2].lastIndexOf("a")).to.be.equals(depths1[2].length - 1);
 
             // start
             expect(depths2[0].lastIndexOf(pathname)).to.be.equals(depths2[0].length - pathname.length);
@@ -683,8 +685,10 @@ describe("Persist", function() {
             const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
             // Then
+            // start -> a -> b
             expect(length1).to.be.equals(3);
-            expect(length2).to.be.equals(1);
+            // start -> a
+            expect(length2).to.be.equals(2);
             expect(value).to.be.not.ok;
         });
         it("test depth with reloead start -> a -> b -> start -> start(reload)", async () => {
@@ -728,6 +732,52 @@ describe("Persist", function() {
 
             expect(value2).to.be.not.ok;
             expect(length2).to.be.equals(3);
-        })
+        });
+        it("test depth only get() with start -> a -> b -> start(back)", async () => {
+            // Given
+            const persist = new Persist();
+
+            // When
+            // start
+            persist.get("a");
+            const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // a
+            history.pushState({}, "", "/a");
+            persist.get("a");
+            const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // b
+            history.pushState({}, "", "/b");
+            persist.get("a");
+            const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // start(back)
+            history.go(-2);
+            await wait();
+            persist.get("a");
+            const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // start(reload)
+            // remove start information
+            PersistInjector(
+                {
+                    "./utils": {
+                        ...utils,
+                        getNavigationType: () => 1,
+                    },
+                }
+            );
+
+            // same length4
+            const length5 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // Then
+            expect(length1).to.be.equals(1);
+            expect(length2).to.be.equals(2);
+            expect(length3).to.be.equals(3);
+            expect(length4).to.be.equals(3);
+            expect(length5).to.be.equals(3);
+        });
     });
 });

@@ -9,7 +9,6 @@ import {isNeeded, getUrl, getStorageKey, getNavigationType} from "./utils";
 import {console, window} from "./browser";
 import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "./consts";
 
-let lastUrl = "";
 let currentUrl = "";
 
 function setRec(obj, path, value) {
@@ -33,69 +32,65 @@ function setRec(obj, path, value) {
 	return _obj;
 }
 
-function updateDepth(url, type) {
-	if (currentUrl !== url) {
-		currentUrl = url;
-		const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+function updateDepth(type) {
+	const url = getUrl();
 
-		if (type === TYPE_BACK_FORWARD) {
-			// Change current url only
+	if (currentUrl === url) {
+		return;
+	}
+	// url is not the same for the first time, pushState, or replaceState.
+	currentUrl = url;
+	const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+
+	if (type === TYPE_BACK_FORWARD) {
+		// Change current url only
+		const currentIndex = depths.indexOf(currentUrl);
+
+		if (~currentIndex) {
+			setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, currentUrl);
+		}
+	} else {
+		const prevLastUrl = getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
+
+		reset(getStorageKey(currentUrl));
+		if (type === TYPE_NAVIGATE) {
+			// Remove all url lists with higher index than current index
+			const prevLastIndex = depths.indexOf(prevLastUrl);
+			const removedList = depths.splice(prevLastIndex + 1, depths.length);
+
+			removedList.forEach(removedUrl => {
+				reset(getStorageKey(removedUrl));
+			});
+			// If the type is NAVIGATE and there is information about current url, delete it.
 			const currentIndex = depths.indexOf(currentUrl);
 
-			if (~currentIndex) {
-				lastUrl = currentUrl;
-				setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, lastUrl);
-			}
-		} else {
-			const prevLastUrl = getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
-
-			reset(getStorageKey(currentUrl), null);
-			if (type === TYPE_NAVIGATE) {
-				// Remove all url lists with higher index than current index
-				const prevLastIndex = depths.indexOf(prevLastUrl);
-				const removedList = depths.splice(prevLastIndex + 1, depths.length);
-
-				removedList.forEach(removedUrl => {
-					reset(getStorageKey(removedUrl), null);
-				});
-				// If the type is NAVIGATE and there is information about current url, delete it.
-				const currentIndex = depths.indexOf(currentUrl);
-
-				~currentIndex && depths.splice(currentIndex, 1);
-				setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
-			}
-		}
-	}
-}
-function addDepth(url) {
-	if (url !== lastUrl) {
-		lastUrl = url;
-
-		const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
-
-		if (depths.indexOf(lastUrl) < 0) {
-			depths.push(lastUrl);
+			~currentIndex && depths.splice(currentIndex, 1);
 			setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
 		}
-		setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, lastUrl);
+		// Add depth for new address.
+		if (depths.indexOf(url) < 0) {
+			depths.push(url);
+			setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
+		}
+		setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, url);
 	}
 }
+
 function clear() {
 	const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
 
 	depths.forEach(url => {
-		reset(getStorageKey(url), null);
+		reset(getStorageKey(url));
 	});
 
-	reset(CONST_PERSIST_STATE, null);
+	reset(CONST_PERSIST_STATE);
 
 	currentUrl = "";
-	lastUrl = "";
 }
 if ("onpopstate" in window) {
 	window.addEventListener("popstate", () => {
 		// popstate event occurs when backward or forward
-		updateDepth(getUrl(), TYPE_BACK_FORWARD);
+		updateDepth(TYPE_BACK_FORWARD);
 	});
 }
 
@@ -143,11 +138,10 @@ class Persist {
 	 * @return {String|Number|Boolean|Object|Array}
 	 */
 	get(path) {
-		const url = getUrl();
-		const urlKey = getStorageKey(url);
+		const urlKey = getStorageKey(getUrl());
 
 		// update url for pushState, replaceState
-		updateDepth(url, TYPE_NAVIGATE);
+		updateDepth(TYPE_NAVIGATE);
 		// find path
 		const globalState =	getStateByKey(urlKey, this.key);
 
@@ -178,12 +172,10 @@ class Persist {
 	 * @return {Persist}
 	 */
 	set(path, value) {
-		const url = getUrl();
-		const urlKey = getStorageKey(url);
+		const urlKey = getStorageKey(getUrl());
 
 		// update url for pushState, replaceState
-		updateDepth(url, TYPE_NAVIGATE);
-
+		updateDepth(TYPE_NAVIGATE);
 		// find path
 		const key = this.key;
 		const globalState =	getStateByKey(urlKey, key);
@@ -197,13 +189,10 @@ class Persist {
 				setRec(globalState, path.split("."), value)
 			);
 		}
-
-		// If you are using set method, add the current url to depth.
-		addDepth(url);
 		return this;
 	}
 }
 
 // If navigation's type is not TYPE_BACK_FORWARD, delete information about current url.
-updateDepth(getUrl(), getNavigationType());
+updateDepth(getNavigationType());
 export default Persist;
