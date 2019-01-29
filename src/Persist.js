@@ -32,6 +32,12 @@ function setRec(obj, path, value) {
 	return _obj;
 }
 
+function setPersistState(key, value) {
+	setPersistState(key, value);
+}
+function getPersistState(key) {
+	return getPersistState(key);
+}
 function updateDepth(type) {
 	const url = getUrl();
 
@@ -40,17 +46,17 @@ function updateDepth(type) {
 	}
 	// url is not the same for the first time, pushState, or replaceState.
 	currentUrl = url;
-	const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+	const depths = getPersistState(CONST_DEPTHS) || [];
 
 	if (type === TYPE_BACK_FORWARD) {
 		// Change current url only
 		const currentIndex = depths.indexOf(currentUrl);
 
 		if (~currentIndex) {
-			setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, currentUrl);
+			setPersistState(CONST_LAST_URL, currentUrl);
 		}
 	} else {
-		const prevLastUrl = getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
+		const prevLastUrl = getPersistState(CONST_LAST_URL);
 
 		reset(getStorageKey(currentUrl));
 		if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
@@ -65,19 +71,36 @@ function updateDepth(type) {
 			const currentIndex = depths.indexOf(currentUrl);
 
 			~currentIndex && depths.splice(currentIndex, 1);
-			setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
+			setPersistState(CONST_DEPTHS, depths);
 		}
 		// Add depth for new address.
 		if (depths.indexOf(url) < 0) {
 			depths.push(url);
-			setStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS, depths);
+			setPersistState(CONST_DEPTHS, depths);
 		}
-		setStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL, url);
+		setPersistState(CONST_LAST_URL, url);
 	}
 }
 
+function clearFirst() {
+	const depths = getPersistState(CONST_DEPTHS) || [];
+	const removed = depths.splice(0, 1);
+
+	if (!removed.length) {
+		return false;
+	}
+	const removedUrl = removed[0];
+
+	reset(getStorageKey(removedUrl));
+	if (currentUrl === removedUrl) {
+		currentUrl = "";
+		setPersistState(CONST_LAST_URL, "");
+	}
+	setPersistState(CONST_DEPTHS, depths);
+	return true;
+}
 function clear() {
-	const depths = getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+	const depths = getPersistState(CONST_DEPTHS) || [];
 
 	depths.forEach(url => {
 		reset(getStorageKey(url));
