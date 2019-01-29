@@ -53,7 +53,7 @@ function updateDepth(type) {
 		const prevLastUrl = getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 		reset(getStorageKey(currentUrl));
-		if (type === TYPE_NAVIGATE) {
+		if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
 			// Remove all url lists with higher index than current index
 			const prevLastIndex = depths.indexOf(prevLastUrl);
 			const removedList = depths.splice(prevLastIndex + 1, depths.length);
