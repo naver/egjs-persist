@@ -33,10 +33,23 @@ function setRec(obj, path, value) {
 }
 
 function setPersistState(key, value) {
-	setPersistState(key, value);
+	try {
+		setStateByKey(CONST_PERSIST_STATE, key, value);
+	} catch (e) {
+		if (clearFirst()) {
+			if (key === CONST_LAST_URL) {
+				setPersistState(key, value);
+			} else if (key === CONST_DEPTHS) {
+				setPersistState(key, value && value.slice(1));
+			}
+		} else {
+			// There is no more size to fit in.
+			throw e;
+		}
+	}
 }
 function getPersistState(key) {
-	return getPersistState(key);
+	return getStateByKey(CONST_PERSIST_STATE, key);
 }
 function updateDepth(type) {
 	const url = getUrl();
@@ -52,9 +65,7 @@ function updateDepth(type) {
 		// Change current url only
 		const currentIndex = depths.indexOf(currentUrl);
 
-		if (~currentIndex) {
-			setPersistState(CONST_LAST_URL, currentUrl);
-		}
+		~currentIndex && setPersistState(CONST_LAST_URL, currentUrl);
 	} else {
 		const prevLastUrl = getPersistState(CONST_LAST_URL);
 
@@ -71,13 +82,12 @@ function updateDepth(type) {
 			const currentIndex = depths.indexOf(currentUrl);
 
 			~currentIndex && depths.splice(currentIndex, 1);
-			setPersistState(CONST_DEPTHS, depths);
 		}
 		// Add depth for new address.
 		if (depths.indexOf(url) < 0) {
 			depths.push(url);
-			setPersistState(CONST_DEPTHS, depths);
 		}
+		setPersistState(CONST_DEPTHS, depths);
 		setPersistState(CONST_LAST_URL, url);
 	}
 }
@@ -87,6 +97,7 @@ function clearFirst() {
 	const removed = depths.splice(0, 1);
 
 	if (!removed.length) {
+		// There is an error because there is no depth to add data.
 		return false;
 	}
 	const removedUrl = removed[0];
@@ -95,8 +106,13 @@ function clearFirst() {
 	if (currentUrl === removedUrl) {
 		currentUrl = "";
 		setPersistState(CONST_LAST_URL, "");
+		if (!depths.length) {
+			// I tried to add myself, but it didn't add up, so I got an error.
+			return false;
+		}
 	}
 	setPersistState(CONST_DEPTHS, depths);
+	// Clear the previous record and try to add data again.
 	return true;
 }
 function clear() {
@@ -203,14 +219,23 @@ class Persist {
 		const key = this.key;
 		const globalState =	getStateByKey(urlKey, key);
 
-		if (path.length === 0) {
-			setStateByKey(urlKey, key, value);
-		} else {
-			setStateByKey(
-				urlKey,
-				key,
-				setRec(globalState, path.split("."), value)
-			);
+		try {
+			if (path.length === 0) {
+				setStateByKey(urlKey, key, value);
+			} else {
+				setStateByKey(
+					urlKey,
+					key,
+					setRec(globalState, path.split("."), value)
+				);
+			}
+		} catch (e) {
+			if (clearFirst(e)) {
+				this.set(path, value);
+			} else {
+				// There is no more size to fit in.
+				throw e;
+			}
 		}
 		return this;
 	}
