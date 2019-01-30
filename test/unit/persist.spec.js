@@ -4,7 +4,7 @@ import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import { CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL } from "../../src/consts";
-import {wait} from "./TestHelper";
+import {wait, storageManagerForLimit} from "./TestHelper";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
     {
@@ -389,9 +389,10 @@ describe("Persist", function() {
                     {
                         "./browser": {
                             console: {
+                                ...console,
                                 warn: function() {
                                     warnCalled = true;
-                                }
+                                },
                             },
                             window: {
 
@@ -493,6 +494,177 @@ describe("Persist", function() {
             });
         })
     });
+    describe("test exceed", function () {
+        const pathname = location.pathname;
+        beforeEach(() => {
+            Persist.clear();
+        });
+        afterEach(() => {
+            history.replaceState({}, "", pathname);
+        });
+        it (`test depth test for exceed test (depths limit: 0)`, () => {
+            // Given
+            try {
+                // When
+                const persist = new (PersistInjector(
+                    {
+                        "./storageManager": storageManagerForLimit(0),
+                        "./browser": {
+                            window: {},
+                            console: window
+                        },
+                    }
+                ))("");
+            } catch (e) {
+                // Then
+                // An unconditional error occurs.
+                expect(e.message).to.be.equals("exceed storage");
+                return;
+            }
+            throw new Error("Errors should occur unconditionally, but they ignored them.");
+        });
+        it (`test depth test for exceed test (depths limit: 1, value limit: 0)`, () => {
+            // Given
+            const persist = new (PersistInjector(
+                {
+                    "./storageManager": storageManagerForLimit(1, 0),
+                    "./browser": {
+                        window: {},
+                        console: window
+                    },
+                }
+            ))("");
+
+            // When
+            try {
+                persist.set("a", 1);
+            } catch (e) {
+                // Then
+                // An unconditional error occurs.
+                expect(e.message).to.be.equals("exceed storage");
+                return;
+            }
+            throw new Error("Errors should occur unconditionally, but they ignored them.");
+        });
+        [2, 3, 4, 5].forEach(limit => {
+            it (`test depth test for exceed test (depths limit: ${limit}, value limit: ${limit - 1})`, () => {
+                // Given
+                const persist = new (PersistInjector(
+                    {
+                        "./storageManager": storageManagerForLimit(limit, limit - 1),
+                        "./browser": {
+                            window: {},
+                            console: window
+                        },
+                    }
+                ))("");
+
+                
+                if (limit < 3) {
+                    // When
+                    history.pushState({}, "", "/a0");
+                    persist.set("a", "1");
+
+                    // Then
+                    expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(limit - 1);
+
+                    // When
+                    history.pushState({}, "", "/a1");
+                    persist.set("a", "1");
+
+                    // Then
+                    expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(limit - 1);
+                } else {
+                    for (let j = 0; j < limit - 2; ++j) {
+                        // When
+                        history.pushState({}, "", "/a" + j);
+                        persist.set("a", "1");
+
+                        // Then
+                        // value limit = 3
+                        // start, a0
+                        // start, a0 , a1
+                        // a0 , a1, a2
+                        expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(j + 2);
+                    }
+                }
+                // Keep adding any number.
+                for (let i = 0; i < 20; ++i) {
+                    // When
+                    history.pushState({}, "", "/a" + (limit + i));
+                    persist.set("a", 1);
+
+                    // Then
+                    expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(limit - 1);
+                }
+            });
+        });
+        [1, 2, 3, 4, 5].forEach(limit => {
+            it (`test depth test for exceed test (limit: ${limit})`, () => {
+                // Given
+                const persist = new (PersistInjector(
+                    {
+                        "./storageManager": storageManagerForLimit(limit),
+                        "./browser": {
+                            window: {},
+                            console: window
+                        },
+                    }
+                ))("");
+                
+                for (let i = 2; i <= 8; ++i) {
+                    // When
+                    history.pushState({}, "", "/a" + i);
+                    persist.set("a", "1");
+
+                    // Then
+                    const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
+                    const length = depths.length;
+
+                    if (i < limit) {
+                        // 1: start
+                        // 2: start, a2
+                        // 3: start, a2, a3
+                        // 4: start, a2, a3, a4
+                        // 5: start, a2, a3, a4, a5
+                        expect(length).to.be.equal(i);
+                        expect(depths[0].lastIndexOf(pathname)).to.be.not.equal(-1);
+                    } else if (i > limit) {
+                        // limit = 1
+                        // 1: start
+                        // 2: a2
+                        // 3: a3
+                        // 4: a4
+                        // 5: a5
+                        // limit = 2
+                        // 1: start
+                        // 2: start, a2
+                        // 3: a2, a3
+                        // 4: a3, a4
+                        // 5: a4, a5
+                        expect(length).to.be.equal(limit);
+                        expect(depths[0].indexOf("/a" + (i - limit + 1))).to.be.not.equal(-1);
+
+                        // removed item (0 ~ i - limit)
+                        for (let j = 0; j < i - limit + 1; ++j) {
+                            expect(StorageManager.getStateByKey(utils.getStorageKey(location.origin + "/a" + j), "")).to.be.not.ok;
+                        }
+
+                        // saved item (i - limit + 1 ~ i)
+                        for (let j = 0; j < limit; ++j) {
+                            const url = location.origin + "/a" +  (i - limit + 1 + j);
+
+                            expect(depths[j]).to.be.equals(url);
+                            expect(StorageManager.getStateByKey(utils.getStorageKey(url), "")["a"]).to.be.ok;
+                        }
+                    } else {
+                        // i === limit is no delete
+                        expect(length).to.be.equal(limit);
+                    }
+                }
+            });
+        })
+    })
     describe("test depth", function () {
         const pathname = location.pathname;
         beforeEach(() => {
@@ -573,7 +745,7 @@ describe("Persist", function() {
                     },
                 }
             );
-            // start -> a(x) -> b
+            // start -> a(x) -> b -> a
             const depths1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
 
             persist.set("c", 1);
@@ -583,13 +755,15 @@ describe("Persist", function() {
             const length2 = depths2.length;
 
             // Then
-            expect(length1).to.be.equals(2);
+            expect(length1).to.be.equals(3);
             expect(length2).to.be.equals(3);
 
             // start
             expect(depths1[0].lastIndexOf(pathname)).to.be.equals(depths1[0].length - pathname.length);
-            // a
+            // b
             expect(depths1[1].lastIndexOf("b")).to.be.equals(depths1[1].length - 1);
+            // a
+            expect(depths1[2].lastIndexOf("a")).to.be.equals(depths1[2].length - 1);
 
             // start
             expect(depths2[0].lastIndexOf(pathname)).to.be.equals(depths2[0].length - pathname.length);
@@ -683,8 +857,10 @@ describe("Persist", function() {
             const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
             // Then
+            // start -> a -> b
             expect(length1).to.be.equals(3);
-            expect(length2).to.be.equals(1);
+            // start -> a
+            expect(length2).to.be.equals(2);
             expect(value).to.be.not.ok;
         });
         it("test depth with reloead start -> a -> b -> start -> start(reload)", async () => {
@@ -728,6 +904,52 @@ describe("Persist", function() {
 
             expect(value2).to.be.not.ok;
             expect(length2).to.be.equals(3);
-        })
+        });
+        it("test depth only get() with start -> a -> b -> start(back)", async () => {
+            // Given
+            const persist = new Persist();
+
+            // When
+            // start
+            persist.get("a");
+            const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // a
+            history.pushState({}, "", "/a");
+            persist.get("a");
+            const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // b
+            history.pushState({}, "", "/b");
+            persist.get("a");
+            const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // start(back)
+            history.go(-2);
+            await wait();
+            persist.get("a");
+            const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // start(reload)
+            // remove start information
+            PersistInjector(
+                {
+                    "./utils": {
+                        ...utils,
+                        getNavigationType: () => 1,
+                    },
+                }
+            );
+
+            // same length4
+            const length5 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+
+            // Then
+            expect(length1).to.be.equals(1);
+            expect(length2).to.be.equals(2);
+            expect(length3).to.be.equals(3);
+            expect(length4).to.be.equals(3);
+            expect(length5).to.be.equals(3);
+        });
     });
 });
