@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+<title>Persist - QA</title>
+<meta http-equiv="x-ua-compatible" content="ie=edge"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+<style>
+body {
+		font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+html,
+body,
+ul {
+		margin: 0;
+		padding: 0;
+}
+li {
+		list-style: none;
+}
+a {
+		text-decoration: none;
+		color: inherit;
+}
+section {
+		margin: 15px 0;
+}
+.row {
+		-webkit-user-select: none;
+		background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAQAAADYv8WvAAAAEElEQVR4AWP4D4QMDGoMagAQkgJLtGgMhgAAAABJRU5ErkJggg==) repeat-x bottom;
+		background-size: 1px 1px;
+		font-size: 13px;
+		margin-top: -1px;
+		position: relative;
+}
+.row > h3 {
+		position: absolute;
+		top: 10px;
+		width: 100%;
+		text-align: left;
+		font-size: 13px;
+		padding-left: 23px;
+		box-sizing: border-box;
+		color: #777;
+}
+.row > p {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		margin-left: 23px;
+		min-height: 17px;
+		font-size: 13px;
+		color: #777;
+}
+button {
+		display: block;
+		width: 100%;
+		height: 40px;
+		margin: 0 auto;
+		background-color: rgba(232, 232, 232, 0.26);
+		border: 1px solid rgba(232, 232, 232, 0.76);
+		color: #777;
+		font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		font-size: 17px;
+}
+button:focus {
+		outline: 0;
+}
+.r_more_load {
+		text-align: center;
+}
+/* logging */
+#debug {
+		height: 40px;
+		width: 100%;
+		background-color: rgba(255, 255, 255, .6);
+		text-align: center;
+}
+/* prevent tap highlight */
+.NO_TAP_HIGHLIGHT {
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+.NO_TAP_HIGHLIGHT * {
+	-webkit-tap-highlight-color: rgba(0, 0, 0, .25);
+}
+.tests {
+	font-size: 0;
+	text-align: center;
+}
+.tests a:nth-child(1) button {
+	width: 100%;
+}
+.tests button {
+	width: 49.5%;
+	margin: 0;
+	display: inline-block;
+	box-sizing: border-box;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+<script src="../release/latest/dist/persist.js"></script>
+</head>
+<body>
+	<div id="testlog"></div>
+	<div class="tests">
+		<a onClick="eg.Persist.clear();location.reload()"><button class="clear">Clear</button></a>
+		<a href="persist1.html"><button>Go 1</button></a>
+		<a href="persist2.html"><button>Go 2</button></a>
+		<a href="persist3.html"><button>Go 3</button></a>
+		<a href="persist4.html"><button>Go 4</button></a>
+		<a onClick="history.pushState({}, 'Go Push 1', 'persist1.html')"><button>Go 1(p)</button></a>
+		<a onClick="history.pushState({}, 'Go Push 2', 'persist2.html')"><button>Go 2(p)</button></a>
+		<a onClick="history.pushState({}, 'Go Push 3', 'persist3.html')"><button>Go 3(p)</button></a>
+		<a onClick="history.pushState({}, 'Go Push 4', 'persist4.html')"><button>Go 4(p)</button></a>
+	</div>
+		<section id="newsLoader1">
+				<ul class="listContainer">
+						<li class="row">
+								<p><a href="http://www.bbc.com/news/world-europe-35088276">French far right National Front 'routed' in key vote</a></p>
+								<p></p>
+						</li>
+						<li class="row">
+								<p><a href="http://www.bbc.com/news/business-35019718">China football revolution can be a financial game changer</a></p>
+								<p></p>
+						</li>
+						<li class="row">
+								<p><a href="http://www.bbc.com/news/magazine-35039105">The dogs that protect Little Penguins</a></p>
+								<p></p>
+						</li>
+						<li class="row">
+								<p><a href="http://www.bbc.com/news/magazine-34935220">'If I became an informer the chemotherapy could continue'</a></p>
+								<p></p>
+						</li>
+						<li class="row">
+								<p><a href="http://www.bbc.com/news/magazine-34797017">The employees shut inside coffins</a></p>
+								<p></p>
+						</li>
+				</ul>
+				<button>load more 1</button>
+		</section>
+<script src="./js/demo.js"></script>
+<script src="./js/test.js"></script>
+</body>
+</html>
