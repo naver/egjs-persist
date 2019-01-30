@@ -26,5 +26,19 @@ function update(pop) {
 		"type : " + type  + "<br/>" + 
 		"";
 }
+function pushBig() {
+	var arr = [];
 
+	for (var i = 0; i < 2 ** 20; ++i) {
+		// 300kb * 4 = 1.2
+		arr[i] = "ab";
+	}
+
+	const persist = new eg.Persist("aaaa");
+
+	var text = arr.join("");
+
+	persist.set("rand" + Math.floor(Math.random() * 100), text);
+	update();
+}
 update();

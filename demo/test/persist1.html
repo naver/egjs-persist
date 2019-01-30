@@ -86,9 +86,9 @@ button:focus {
 	font-size: 0;
 	text-align: center;
 }
-.tests a:nth-child(1) button {
+/* .tests a:nth-child(1) button {
 	width: 100%;
-}
+} */
 .tests button {
 	width: 49.5%;
 	margin: 0;
@@ -103,6 +103,7 @@ button:focus {
 	<div id="testlog"></div>
 	<div class="tests">
 		<a onClick="eg.Persist.clear();location.reload()"><button class="clear">Clear</button></a>
+		<a onClick="pushBig();"><button class="push">push(1.2mb)</button></a>
 		<a href="persist1.html"><button>Go 1</button></a>
 		<a href="persist2.html"><button>Go 2</button></a>
 		<a href="persist3.html"><button>Go 3</button></a>
