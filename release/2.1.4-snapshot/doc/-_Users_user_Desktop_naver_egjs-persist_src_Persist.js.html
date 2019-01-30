@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Source: /Users/user/Desktop/naver/egjs-persist/src/Persist.js | egjs::persist - API</title>
+    
+    <meta name="description" content="Provide cache interface to handle persisted data among history navigation." />
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <link rel="canonical" href="http://naver.github.io/egjs-persist/release/latest/doc/"/>
+    
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jaguar.css">
+    
+    
+    <script>
+    var config = {"monospaceLinks":true,"cleverLinks":true,"default":{"outputSourceFiles":true},"applicationName":"eg.Persist","disqus":"egjs","googleAnalytics":"UA-70842526-19","openGraph":{"title":"","type":"website","image":"","site_name":"","url":""},"meta":{"title":"egjs::persist - API","description":"Provide cache interface to handle persisted data among history navigation.","keyword":""},"linenums":true,"link":{"canonical":"http://naver.github.io/egjs-persist/release/latest/doc/"}};
+    </script>
+    
+
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', config.googleAnalytics]);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+<body>
+<div id="wrap" class="clearfix">
+    
+<div class="navigation">
+    <h3 class="applicationName">
+        <a href="//naver.github.io/egjs/"><img style="width:40px; height:20px;" src="img/type_white.svg"/></a>
+        <a href="//naver.github.io/egjs-persist/">Persist</a>
+    </h3>
+
+    <div class="search">
+        <input id="search" type="text" class="form-control input-sm" placeholder="Search Documentations">
+    </div>
+    <ul class="list">
+        <li class="item">
+            <span class="title">
+                <a href="index.html">README</a>
+            </span>
+        </li>
+    
+        <!-- Non Grouping Version -->
+        
+            
+
+<li class="item" data-name="eg.Persist">
+    <span class="title">
+        <a href="eg.Persist.html">eg.Persist</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    <span class="subtitle">Methods</span>
+    
+        <li data-name="eg.Persist.clear"><a href="eg.Persist.html#.clear">clear</a></li>
+    
+        <li data-name="eg.Persist.isNeeded"><a href="eg.Persist.html#.isNeeded">isNeeded</a></li>
+    
+        <li data-name="eg.Persist#get"><a href="eg.Persist.html#get">get</a></li>
+    
+        <li data-name="eg.Persist#set"><a href="eg.Persist.html#set">set</a></li>
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+    
+    </ul>
+</div>
+
+    <div class="main">
+        <h1 class="page-title" data-filename="-_Users_user_Desktop_naver_egjs-persist_src_Persist.js.html">Source: /Users/user/Desktop/naver/egjs-persist/src/Persist.js</h1>
+        
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-use-before-define */
+import {
+	reset,
+	setStateByKey,
+	getStateByKey,
+	getStorage,
+} from "./storageManager";
+import {isNeeded, getUrl, getStorageKey, getNavigationType} from "./utils";
+import {console, window} from "./browser";
+import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "./consts";
+
+let currentUrl = "";
+
+function setRec(obj, path, value) {
+	let _obj = obj;
+
+	if (!_obj) {
+		_obj = isNaN(path[0]) ? {} : [];
+	}
+
+	const head = path.shift();
+
+	if (path.length === 0) {
+		if (_obj instanceof Array &amp;&amp; isNaN(head)) {
+			console.warn("Don't use key string on array");
+		}
+		_obj[head] = value;
+		return _obj;
+	}
+
+	_obj[head] = setRec(_obj[head], path, value);
+	return _obj;
+}
+
+function setPersistState(key, value) {
+	try {
+		setStateByKey(CONST_PERSIST_STATE, key, value);
+	} catch (e) {
+		if (clearFirst()) {
+			if (key === CONST_LAST_URL) {
+				setPersistState(key, value);
+			} else if (key === CONST_DEPTHS) {
+				setPersistState(key, value &amp;&amp; value.slice(1));
+			}
+		} else {
+			// There is no more size to fit in.
+			throw e;
+		}
+	}
+}
+function getPersistState(key) {
+	return getStateByKey(CONST_PERSIST_STATE, key);
+}
+function updateDepth(type) {
+	const url = getUrl();
+
+	if (currentUrl === url) {
+		return;
+	}
+	// url is not the same for the first time, pushState, or replaceState.
+	currentUrl = url;
+	const depths = getPersistState(CONST_DEPTHS) || [];
+
+	if (type === TYPE_BACK_FORWARD) {
+		// Change current url only
+		const currentIndex = depths.indexOf(currentUrl);
+
+		~currentIndex &amp;&amp; setPersistState(CONST_LAST_URL, currentUrl);
+	} else {
+		const prevLastUrl = getPersistState(CONST_LAST_URL);
+
+		reset(getStorageKey(currentUrl));
+		if (type === TYPE_NAVIGATE &amp;&amp; url !== prevLastUrl) {
+			// Remove all url lists with higher index than current index
+			const prevLastIndex = depths.indexOf(prevLastUrl);
+			const removedList = depths.splice(prevLastIndex + 1, depths.length);
+
+			removedList.forEach(removedUrl => {
+				reset(getStorageKey(removedUrl));
+			});
+			// If the type is NAVIGATE and there is information about current url, delete it.
+			const currentIndex = depths.indexOf(currentUrl);
+
+			~currentIndex &amp;&amp; depths.splice(currentIndex, 1);
+		}
+		// Add depth for new address.
+		if (depths.indexOf(url) &lt; 0) {
+			depths.push(url);
+		}
+		setPersistState(CONST_DEPTHS, depths);
+		setPersistState(CONST_LAST_URL, url);
+	}
+}
+
+function clearFirst() {
+	const depths = getPersistState(CONST_DEPTHS) || [];
+	const removed = depths.splice(0, 1);
+
+	if (!removed.length) {
+		// There is an error because there is no depth to add data.
+		return false;
+	}
+	const removedUrl = removed[0];
+
+	reset(getStorageKey(removedUrl));
+	if (currentUrl === removedUrl) {
+		currentUrl = "";
+		setPersistState(CONST_LAST_URL, "");
+		if (!depths.length) {
+			// I tried to add myself, but it didn't add up, so I got an error.
+			return false;
+		}
+	}
+	setPersistState(CONST_DEPTHS, depths);
+	// Clear the previous record and try to add data again.
+	return true;
+}
+function clear() {
+	const depths = getPersistState(CONST_DEPTHS) || [];
+
+	depths.forEach(url => {
+		reset(getStorageKey(url));
+	});
+
+	reset(CONST_PERSIST_STATE);
+
+	currentUrl = "";
+}
+if ("onpopstate" in window) {
+	window.addEventListener("popstate", () => {
+		// popstate event occurs when backward or forward
+		updateDepth(TYPE_BACK_FORWARD);
+	});
+}
+
+/**
+ * Get or store the current state of the web page using JSON.
+ * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
+ * @alias eg.Persist
+ *
+ * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
+ */
+class Persist {
+	static VERSION = "#__VERSION__#";
+	static StorageManager = {
+		reset,
+		setStateByKey,
+		getStateByKey,
+		getStorage,
+	};
+	/**
+	 * @static
+	 * Clear all information in Persist
+	 */
+	static clear() {
+		clear();
+	}
+	/**
+	 * @static
+	 * Return whether you need "Persist" module by checking the bfCache support of the current browser
+	 * @return {Boolean}
+	 */
+	static isNeeded() {
+		return isNeeded;
+	}
+	/**
+	* Constructor
+	* @param {String} key The key of the state information to be stored &lt;ko>저장할 상태 정보의 키&lt;/ko>
+	**/
+	constructor(key) {
+		this.key = key || "";
+	}
+
+	/**
+	 * Read value
+	 * @param {String?} path target path
+	 * @return {String|Number|Boolean|Object|Array}
+	 */
+	get(path) {
+		const urlKey = getStorageKey(getUrl());
+
+		// update url for pushState, replaceState
+		updateDepth(TYPE_NAVIGATE);
+		// find path
+		const globalState =	getStateByKey(urlKey, this.key);
+
+		if (!path || path.length === 0) {
+			return globalState;
+		}
+
+		const pathToken = path.split(".");
+		let currentItem = globalState;
+		let isTargetExist = true;
+
+		for (let i = 0; i &lt; pathToken.length; i++) {
+			if (!currentItem) {
+				isTargetExist = false;
+				break;
+			}
+			currentItem = currentItem[pathToken[i]];
+		}
+		if (!isTargetExist || !currentItem) {
+			return null;
+		}
+		return currentItem;
+	}
+	/**
+	 * Save value
+	 * @param {String} path target path
+	 * @param {String|Number|Boolean|Object|Array} value value to save
+	 * @return {Persist}
+	 */
+	set(path, value) {
+		const urlKey = getStorageKey(getUrl());
+
+		// update url for pushState, replaceState
+		updateDepth(TYPE_NAVIGATE);
+		// find path
+		const key = this.key;
+		const globalState =	getStateByKey(urlKey, key);
+
+		try {
+			if (path.length === 0) {
+				setStateByKey(urlKey, key, value);
+			} else {
+				setStateByKey(
+					urlKey,
+					key,
+					setRec(globalState, path.split("."), value)
+				);
+			}
+		} catch (e) {
+			if (clearFirst(e)) {
+				this.set(path, value);
+			} else {
+				// There is no more size to fit in.
+				throw e;
+			}
+		}
+		return this;
+	}
+}
+
+// If navigation's type is not TYPE_BACK_FORWARD, delete information about current url.
+updateDepth(getNavigationType());
+export default Persist;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+
+        
+        <!-- disqus code -->
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        <!-- // disqus code -->
+        
+
+        <footer>
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 30 2019 16:26:13 GMT+0900 (Korean Standard Time)
+        </footer>
+    </div>
+</div>
+<script>prettyPrint();</script>
+<script src="scripts/main.js"></script>
+</body>
+</html>
