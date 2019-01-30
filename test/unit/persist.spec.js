@@ -575,8 +575,8 @@ describe("Persist", function() {
                     // Then
                     expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(limit - 1);
                 } else {
-                    // When
                     for (let j = 0; j < limit - 2; ++j) {
+                        // When
                         history.pushState({}, "", "/a" + j);
                         persist.set("a", "1");
 
@@ -588,14 +588,13 @@ describe("Persist", function() {
                         expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(j + 2);
                     }
                 }
-                // When
                 // Keep adding any number.
                 for (let i = 0; i < 20; ++i) {
+                    // When
                     history.pushState({}, "", "/a" + (limit + i));
                     persist.set("a", 1);
 
                     // Then
-                    // console.log(i, limit);
                     expect(StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length).to.be.equals(limit - 1);
                 }
             });
