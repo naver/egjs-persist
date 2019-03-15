@@ -49,6 +49,7 @@ function getStorage() {
  */
 function getState(key) {
 	let state;
+
 	let stateStr;
 
 	if (storage) {

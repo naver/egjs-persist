@@ -189,7 +189,9 @@ class Persist {
 		}
 
 		const pathToken = path.split(".");
+
 		let currentItem = globalState;
+
 		let isTargetExist = true;
 
 		for (let i = 0; i < pathToken.length; i++) {
