@@ -69,7 +69,7 @@ describe("Persist", function() {
             history.replaceState(null,null,null);
             expect(history.state).to.equal(null);
             const persist = new PersistUsingHistory("TESTKEY");
-            
+
             // When
             persist.set("flick", {
                 index: 10
@@ -84,12 +84,38 @@ describe("Persist", function() {
         beforeEach(() => {
             location.hash = "";
             sessionStorage.clear();
-        });
+		});
+		it("save 0, false, get 0, false", () => {
+			// Given
+			const persist = new Persist({
+				key: "TESTKEY",
+			});
+
+			// When
+			persist.set("test.a", "");
+			persist.set("test.b", 0);
+			persist.set("test.c", null);
+			persist.set("test.d", undefined);
+			persist.set("a", "");
+			persist.set("b", 0);
+			persist.set("c", null);
+			persist.set("d", undefined);
+
+			// Then
+			expect(persist.get("test.a")).to.be.equals('');
+			expect(persist.get("test.b")).to.be.equals(0);
+			expect(persist.get("test.c")).to.be.equals(null);
+			expect(persist.get("test.d")).to.be.equals(null);
+			expect(persist.get("a")).to.be.equals('');
+			expect(persist.get("b")).to.be.equals(0);
+			expect(persist.get("c")).to.be.equals(null);
+			expect(persist.get("d")).to.be.equals(null);
+
+		})
         it("save number, get number(hash is all different)", () => {
         // Given
         const persist = new Persist({
             key: "TESTKEY",
-            excludeHash: true,
         });
 
         // When
@@ -559,7 +585,7 @@ describe("Persist", function() {
                     }
                 ))("");
 
-                
+
                 if (limit < 3) {
                     // When
                     history.pushState({}, "", "/a0");
@@ -611,7 +637,7 @@ describe("Persist", function() {
                         },
                     }
                 ))("");
-                
+
                 for (let i = 2; i <= 8; ++i) {
                     // When
                     history.pushState({}, "", "/a" + i);
@@ -735,7 +761,7 @@ describe("Persist", function() {
 
             // a (new)
             history.pushState({}, "", "/a");
-            
+
             // remove (a) information
             PersistInjector(
                 {
@@ -750,7 +776,7 @@ describe("Persist", function() {
 
             persist.set("c", 1);
             // start -> b -> a(new)
-            const depths2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);            
+            const depths2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
             const length1 = depths1.length;
             const length2 = depths2.length;
 
