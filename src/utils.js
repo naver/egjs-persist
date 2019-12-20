@@ -1,4 +1,4 @@
-import {navigator, parseFloat, performance} from "./browser";
+import {navigator, parseFloat, performance, location} from "./browser";
 import {CONST_PERSIST} from "./consts";
 
 const userAgent = navigator ? navigator.userAgent : "";
@@ -26,7 +26,7 @@ function getNavigationType() {
 		performance.navigation.type;
 }
 function getUrl() {
-	return location.href.split("#")[0];
+	return location ? location.href.split("#")[0] : "";
 }
 function getStorageKey(name) {
 	return name + CONST_PERSIST;
