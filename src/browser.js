@@ -10,6 +10,7 @@ export const parseFloat = win.parseFloat;
 export const performance = win.performance;
 
 let localStorage = null;
+
 let sessionStorage = null;
 
 try {
