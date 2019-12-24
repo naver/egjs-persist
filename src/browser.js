@@ -9,16 +9,16 @@ export const navigator = win.navigator;
 export const parseFloat = win.parseFloat;
 export const performance = win.performance;
 
-
-let localStorage;
-let sessionStorage;
+let localStorage = null;
+let sessionStorage = null;
 
 try {
 	localStorage = win.localStorage;
 	sessionStorage = win.sessionStorage;
 } catch (e) {
-	localStorage = null;
-	sessionStorage = null;
 }
 
-export { localStorage, sessionStorage };
+export {
+	localStorage,
+	sessionStorage,
+};
