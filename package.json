@@ -94,7 +94,7 @@
 		"sync-exec": "^0.6.2",
 		"uglifyjs-webpack-plugin": "^0.4.6",
 		"webpack": "^3.4.1",
-		"webpack-dev-server": "^2.6.1",
+		"webpack-dev-server": "^3.1.11",
 		"webpack-merge": "^4.1.0",
 		"write-file-webpack-plugin": "^4.1.0"
 	}
