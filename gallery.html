@@ -72,23 +72,23 @@
 </div>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"commentModule"</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentModule</span><span class="dl">"</span><span class="p">);</span>
 
-<span class="nx">$</span><span class="p">(</span><span class="s2">".loadCmtBtn"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.loadCmtBtn</span><span class="dl">"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 	<span class="c1">// Make change to the component. (append comments) </span>
-	<span class="nx">$</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"/api/123/nextcomment"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
-		<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
+	<span class="nx">$</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">/api/123/nextcomment</span><span class="dl">"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
 
 		<span class="c1">// Save snapshot of the component when there is a change</span>
-		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
-		<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+		<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentsHTML</span><span class="dl">"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
 	<span class="p">});</span>
 <span class="p">});</span>
 	
 <span class="c1">// Restore state when initiate component</span>
-<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">);</span>
-	<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentsHTML</span><span class="dl">"</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div></div>
 

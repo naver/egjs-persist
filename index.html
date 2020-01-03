@@ -60,7 +60,7 @@
         <div class="hero-image" style="background-image: url(//naver.github.io/egjs/img/Persist.png)">
         </div>
         <h2 class="title">
-            <span class="highlight">Persist</span><a href="https://github.com/naver/egjs-persist/releases/tag/2.2.1"><span class="version">v2.2.1</span></a>
+            <span class="highlight">Persist</span><a href="https://github.com/naver/egjs-persist/releases/tag/2.2.2"><span class="version">v2.2.2</span></a>
         </h2>
         <p class="intro">Provide cache interface to handle persisted data among history navigation.<br/>
             <span class="hashtag">#bfcache #storage</span>
@@ -112,29 +112,29 @@
 <h3 id="initialize">Initialize</h3>
 
 <h4 id="es5">ES5</h4>
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="dl">"</span><span class="s2">componentID</span><span class="dl">"</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h4 id="es6">ES6+</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">Persist</span> <span class="k">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">Persist</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@egjs/persist</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="dl">"</span><span class="s2">componentID</span><span class="dl">"</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h3 id="usage">Usage</h3>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">Persist</span> <span class="k">from</span> <span class="s2">"@egjs/persist"</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="s2">"componentID"</span><span class="p">);</span>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">Persist</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">@egjs/persist</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Persist</span><span class="p">(</span><span class="dl">"</span><span class="s2">componentID</span><span class="dl">"</span><span class="p">);</span>
 
 <span class="c1">// Overwrite global object</span>
 <span class="kd">var</span> <span class="nx">snapshotObject</span> <span class="o">=</span> <span class="p">{</span> 
-    <span class="na">list</span><span class="p">:</span> <span class="p">[{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"foo"</span><span class="p">},</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">}]</span>
+    <span class="na">list</span><span class="p">:</span> <span class="p">[{</span><span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">foo</span><span class="dl">"</span><span class="p">},</span> <span class="p">{</span><span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">bar</span><span class="dl">"</span><span class="p">}]</span>
     <span class="na">index</span><span class="p">:</span> <span class="mi">0</span>
 <span class="p">};</span>
 
-<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">""</span><span class="p">,</span> <span class="nx">snapshotObject</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">""</span><span class="p">,</span> <span class="nx">snapshotObject</span><span class="p">);</span>
 
 <span class="c1">// Get global object</span>
-<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">""</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
 <span class="cm">/* 
 { 
     list: [{name: "foo"}, {name: "bar"}]
@@ -143,17 +143,17 @@
 */</span>
 
 <span class="c1">// Get with property name and index</span>
-<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"index"</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">index</span><span class="dl">"</span><span class="p">);</span>
 <span class="c1">// =&gt; 0</span>
 
-<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"list.0"</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">list.0</span><span class="dl">"</span><span class="p">);</span>
 <span class="c1">// =&gt; {name: "foo"}</span>
 
-<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"list.0.name"</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">list.0.name</span><span class="dl">"</span><span class="p">);</span>
 <span class="c1">// =&gt; "foo"</span>
 
 <span class="c1">// Set with property name and index</span>
-<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">"list.2"</span><span class="p">,</span> <span class="s2">"foo"</span><span class="p">);</span>
+<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">"</span><span class="s2">list.2</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">foo</span><span class="dl">"</span><span class="p">);</span>
 <span class="cm">/* =&gt; this
 { 
     list: [{name: "foo"}, {name: "bar"}, "foo"]
@@ -163,9 +163,9 @@
 
 <span class="c1">// Chaining with set method </span>
 <span class="nx">persist</span>
-    <span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">"isActive"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
-    <span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">"index"</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"list"</span><span class="p">);</span>
+    <span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">"</span><span class="s2">isActive</span><span class="dl">"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
+    <span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">"</span><span class="s2">index</span><span class="dl">"</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">list</span><span class="dl">"</span><span class="p">);</span>
 <span class="c1">//=&gt; [{name: "foo"}, {name: "bar"}, "foo"] </span>
 </code></pre></div></div>
 
@@ -207,23 +207,23 @@
 </div>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="s2">"commentModule"</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">persist</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">eg</span><span class="p">.</span><span class="nx">Persist</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentModule</span><span class="dl">"</span><span class="p">);</span>
 
-<span class="nx">$</span><span class="p">(</span><span class="s2">".loadCmtBtn"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">"click"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.loadCmtBtn</span><span class="dl">"</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="dl">"</span><span class="s2">click</span><span class="dl">"</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 	<span class="c1">// Make change to the component. (append comments) </span>
-	<span class="nx">$</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"/api/123/nextcomment"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
-		<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
+	<span class="nx">$</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">/api/123/nextcomment</span><span class="dl">"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">commentHtml</span><span class="p">);</span>		
 
 		<span class="c1">// Save snapshot of the component when there is a change</span>
-		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
-		<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">snapshot</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">html</span><span class="p">();</span>
+		<span class="nx">persist</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentsHTML</span><span class="dl">"</span><span class="p">,</span> <span class="nx">snapshot</span><span class="p">);</span>
 	<span class="p">});</span>
 <span class="p">});</span>
 	
 <span class="c1">// Restore state when initiate component</span>
-<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s2">"commentsHTML"</span><span class="p">);</span>
-	<span class="nx">$</span><span class="p">(</span><span class="s2">".commentContainer"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">""</span><span class="p">)</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">commentsHTML</span> <span class="o">=</span> <span class="nx">persist</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">"</span><span class="s2">commentsHTML</span><span class="dl">"</span><span class="p">);</span>
+	<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">.commentContainer</span><span class="dl">"</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">commentsHTML</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
