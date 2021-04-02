@@ -18,6 +18,11 @@ declare module "@egjs/persist" {
 		 * Save value
 		 */
 		public set(path: string, value: persistValueType): this;
+
+		/**
+		 * Remove value
+		 */
+		 public remove(path: string): this;
 	}
 
 	export default Persist;
