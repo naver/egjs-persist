@@ -11,7 +11,8 @@ import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CON
 
 let currentUrl = "";
 
-function setRec(obj, path, value) {
+
+function execRec(obj, path, func) {
 	let _obj = obj;
 
 	if (!_obj) {
@@ -24,11 +25,11 @@ function setRec(obj, path, value) {
 		if (_obj instanceof Array && isNaN(head)) {
 			console.warn("Don't use key string on array");
 		}
-		_obj[head] = value;
+		func(_obj, head);
 		return _obj;
 	}
 
-	_obj[head] = setRec(_obj[head], path, value);
+	_obj[head] = execRec(_obj[head], path, func);
 	return _obj;
 }
 
@@ -70,6 +71,7 @@ function updateDepth(type) {
 		const prevLastUrl = getPersistState(CONST_LAST_URL);
 
 		reset(getStorageKey(currentUrl));
+
 		if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
 			// Remove all url lists with higher index than current index
 			const prevLastIndex = depths.indexOf(prevLastUrl);
@@ -177,12 +179,13 @@ class Persist {
 	 * @return {String|Number|Boolean|Object|Array}
 	 */
 	get(path) {
-		const urlKey = getStorageKey(getUrl());
-
 		// update url for pushState, replaceState
 		updateDepth(TYPE_NAVIGATE);
+
 		// find path
+		const urlKey = getStorageKey(getUrl());
 		const globalState =	getStateByKey(urlKey, this.key);
+
 
 		if (!path || path.length === 0) {
 			return globalState;
@@ -213,27 +216,70 @@ class Persist {
 	 * @return {Persist}
 	 */
 	set(path, value) {
-		const urlKey = getStorageKey(getUrl());
-
 		// update url for pushState, replaceState
 		updateDepth(TYPE_NAVIGATE);
 		// find path
 		const key = this.key;
+		const urlKey = getStorageKey(getUrl());
 		const globalState =	getStateByKey(urlKey, key);
 
 		try {
 			if (path.length === 0) {
 				setStateByKey(urlKey, key, value);
 			} else {
+				const allValue = execRec(globalState, path.split("."), (obj, head) => {
+					obj[head] = value;
+				});
+
 				setStateByKey(
 					urlKey,
 					key,
-					setRec(globalState, path.split("."), value)
+					allValue
 				);
 			}
 		} catch (e) {
 			if (clearFirst(e)) {
 				this.set(path, value);
+			} else {
+				// There is no more size to fit in.
+				throw e;
+			}
+		}
+		return this;
+	}
+	/**
+	 * Remove value
+	 * @param {String} path target path
+	 * @return {Persist}
+	 */
+	remove(path) {
+		// update url for pushState, replaceState
+		updateDepth(TYPE_NAVIGATE);
+
+		// find path
+		const key = this.key;
+		const urlKey = getStorageKey(getUrl());
+		const globalState =	getStateByKey(urlKey, key);
+
+		try {
+			if (path.length === 0) {
+				setStateByKey(urlKey, key, null);
+			} else {
+				const value = execRec(globalState, path.split("."), (obj, head) => {
+					if (typeof obj === "object") {
+						delete obj[head];
+					}
+				});
+
+				setStateByKey(
+					urlKey,
+					key,
+					value
+				);
+			}
+		} catch (e) {
+			if (clearFirst(e)) {
+				this.remove(path);
 			} else {
 				// There is no more size to fit in.
 				throw e;
