@@ -1,12 +1,13 @@
 /* eslint-disable no-new */
 /* eslint-disable no-unused-expressions */
 import PersistInjector from "inject-loader!../../src/Persist";
+import UtilsInjector from "inject-loader!../../src/utils";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, storageManagerForLimit} from "./TestHelper";
+import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL} from "./TestHelper";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
 	{
@@ -21,11 +22,19 @@ const StorageManagerUsingHistory = StorageManagerInjector(
 	}
 );
 
-const PersistUsingHistory = PersistInjector(
-	{
-		"./storageManager": StorageManagerUsingHistory,
-	}
-);
+const PersistUsingHistory = PersistInjector({
+	"./storageManager": StorageManagerUsingHistory,
+});
+
+const mockBrowser = injectBrowser();
+const mockState = {
+	"./storageManager": StorageManagerInjector({
+		"./browser": mockBrowser,
+	}),
+	"./utils": UtilsInjector({
+		"./browser": mockBrowser,
+	}),
+};
 
 
 describe("Persist", () => {
@@ -631,7 +640,7 @@ describe("Persist", () => {
 					"./storageManager": storageManagerForLimit(1, 0),
 					"./browser": {
 						window: {},
-						console: window,
+						console,
 					},
 				}
 			))("");
@@ -655,7 +664,7 @@ describe("Persist", () => {
 						"./storageManager": storageManagerForLimit(limit, limit - 1),
 						"./browser": {
 							window: {},
-							console: window,
+							console,
 						},
 					}
 				))("");
@@ -711,19 +720,16 @@ describe("Persist", () => {
 		[1, 2, 3, 4, 5].forEach(limit => {
 			it(`test depth test for exceed test (limit: ${limit})`, () => {
 				// Given
-				const persist = new(PersistInjector(
-					{
-						"./storageManager": storageManagerForLimit(limit),
-						"./browser": {
-							window: {},
-							console: window,
-						},
-					}
-				))("");
+				const mockModules = injectPersistModules({
+					sessionLimitCount: limit,
+				});
+				const mockHistory = mockModules["./browser"].history;
+				const mockLocation = mockModules["./browser"].location;
+				const persist = new(PersistInjector(mockModules))("");
 
 				for (let i = 2; i <= 8; ++i) {
 					// When
-					history.pushState({}, "", `/a${i}`);
+					mockHistory.pushState({}, "", `/a${i}`);
 					persist.set("a", "1");
 
 					// Then
@@ -756,12 +762,12 @@ describe("Persist", () => {
 
 						// removed item (0 ~ i - limit)
 						for (let j = 0; j < i - limit + 1; ++j) {
-							expect(StorageManager.getStateByKey(utils.getStorageKey(`${location.origin}/a${j}`), "")).to.be.not.ok;
+							expect(StorageManager.getStateByKey(utils.getStorageKey(`${mockLocation.origin}/a${j}`), "")).to.be.not.ok;
 						}
 
 						// saved item (i - limit + 1 ~ i)
 						for (let j = 0; j < limit; ++j) {
-							const url = `${location.origin}/a${i - limit + 1 + j}`;
+							const url = `${mockLocation.origin}/a${i - limit + 1 + j}`;
 
 							expect(depths[j]).to.be.equals(url);
 							expect(StorageManager.getStateByKey(utils.getStorageKey(url), "").a).to.be.ok;
@@ -785,8 +791,12 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> c", () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
 
+			InjectedPersist.clear();
 			// When
 			const prevUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
@@ -794,21 +804,21 @@ describe("Persist", () => {
 			const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			const prevUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			persist.set("a", 1);
 			const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
-			history.pushState({}, "", "/b");
+			mockHistory.pushState({}, "", "/b");
 			const prevUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			persist.set("b", 1);
 			const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
-			history.pushState({}, "", "/c");
+			mockHistory.pushState({}, "", "/c");
 			const prevUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			persist.set("c", 1);
@@ -833,32 +843,35 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> a(new)", () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
+
+			InjectedPersist.clear();
 
 			// When
 			// start
 			persist.set("0", 1);
 
 			// a
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
+
 			persist.set("a", 1);
 
 			// b
-			history.pushState({}, "", "/b");
+			mockHistory.pushState({}, "", "/b");
+
 			persist.set("b", 1);
 
 			// a (new)
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 
 			// remove (a) information
-			PersistInjector(
-				{
-					"./utils": {
-						...utils,
-						getNavigationType: () => 0,
-					},
-				}
-			);
+			PersistInjector(injectPersistModules({
+				href: `${INJECT_URL}/a`,
+			}));
+
 			// start -> a(x) -> b -> a
 			const depths1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
 
@@ -888,7 +901,12 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> start(back) -> a(forward)", async () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
+
+			InjectedPersist.clear();
 
 			// When
 			// start
@@ -898,27 +916,29 @@ describe("Persist", () => {
 			const currentUrl1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			// a
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			persist.set("value", 2);
 			const value2 = persist.get("value");
 			const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			// start (back)
-			history.go(-1);
+			mockHistory.go(-1);
 			await wait();
+
 
 			const value3 = persist.get("value");
 			const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
 
 			// a (forward)
-			history.go(1);
+			mockHistory.go(1);
 			await wait();
 
 			const value4 = persist.get("value");
 			const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 			const currentUrl4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_LAST_URL);
+
 
 			// Then
 			// start
@@ -945,27 +965,32 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> start(back) -> a(new)", async () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
+
+			InjectedPersist.clear();
 
 			// When
 			// start
 			persist.set("value", 1);
 
 			// a
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			persist.set("value", 2);
 
 			// b
-			history.pushState({}, "", "/b");
+			mockHistory.pushState({}, "", "/b");
 			persist.set("value", 3);
 
 			// start(back)
-			history.go(-2);
+			mockHistory.go(-2);
 			await wait();
 			const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
 			// a(new)
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			await wait();
 			const value = persist.get("value");
 			const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
@@ -979,22 +1004,27 @@ describe("Persist", () => {
 		});
 		it("test depth with reloead start -> a -> b -> start -> start(reload)", async () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
+
+			InjectedPersist.clear();
 
 			// When
 			// start
 			persist.set("value", 1);
 
 			// a
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			persist.set("value", 2);
 
 			// b
-			history.pushState({}, "", "/b");
+			mockHistory.pushState({}, "", "/b");
 			persist.set("value", 3);
 
 			// start(back)
-			history.go(-2);
+			mockHistory.go(-2);
 			await wait();
 			const value1 = persist.get("value");
 			const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
@@ -1021,7 +1051,12 @@ describe("Persist", () => {
 		});
 		it("test depth only get() with start -> a -> b -> start(back)", async () => {
 			// Given
-			const persist = new Persist();
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = PersistInjector(mockModules);
+			const persist = new InjectedPersist("");
+
+			InjectedPersist.clear();
 
 			// When
 			// start
@@ -1029,17 +1064,17 @@ describe("Persist", () => {
 			const length1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
 			// a
-			history.pushState({}, "", "/a");
+			mockHistory.pushState({}, "", "/a");
 			persist.get("a");
 			const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
 			// b
-			history.pushState({}, "", "/b");
+			mockHistory.pushState({}, "", "/b");
 			persist.get("a");
 			const length3 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
 			// start(back)
-			history.go(-2);
+			mockHistory.go(-2);
 			await wait();
 			persist.get("a");
 			const length4 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;

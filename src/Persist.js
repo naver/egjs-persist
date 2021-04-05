@@ -71,6 +71,7 @@ function updateDepth(type) {
 		const prevLastUrl = getPersistState(CONST_LAST_URL);
 
 		reset(getStorageKey(currentUrl));
+
 		if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
 			// Remove all url lists with higher index than current index
 			const prevLastIndex = depths.indexOf(prevLastUrl);
@@ -184,6 +185,7 @@ class Persist {
 		// find path
 		const urlKey = getStorageKey(getUrl());
 		const globalState =	getStateByKey(urlKey, this.key);
+
 
 		if (!path || path.length === 0) {
 			return globalState;
