@@ -1,13 +1,12 @@
 /* eslint-disable no-new */
 /* eslint-disable no-unused-expressions */
-import PersistInjector from "inject-loader!../../src/Persist";
 import UtilsInjector from "inject-loader!../../src/utils";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL} from "./TestHelper";
+import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist} from "./TestHelper";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
 	{
@@ -22,7 +21,7 @@ const StorageManagerUsingHistory = StorageManagerInjector(
 	}
 );
 
-const PersistUsingHistory = PersistInjector({
+const PersistUsingHistory = injectPersist({
 	"./storageManager": StorageManagerUsingHistory,
 });
 
@@ -484,7 +483,7 @@ describe("Persist", () => {
 			it("cannot setting key value on array with warning", () => {
 				// Given
 				let warnCalled = false;
-				const MockedPersist = PersistInjector(
+				const MockedPersist = injectPersist(
 					{
 						"./browser": {
 
@@ -616,7 +615,7 @@ describe("Persist", () => {
 			// Given
 			try {
 				// When
-				new(PersistInjector(
+				new(injectPersist(
 					{
 						"./storageManager": storageManagerForLimit(0),
 						"./browser": {
@@ -635,7 +634,7 @@ describe("Persist", () => {
 		});
 		it(`test depth test for exceed test (depths limit: 1, value limit: 0)`, () => {
 			// Given
-			const persist = new(PersistInjector(
+			const persist = new(injectPersist(
 				{
 					"./storageManager": storageManagerForLimit(1, 0),
 					"./browser": {
@@ -659,7 +658,7 @@ describe("Persist", () => {
 		[2, 3, 4, 5].forEach(limit => {
 			it(`test depth test for exceed test (depths limit: ${limit}, value limit: ${limit - 1})`, () => {
 				// Given
-				const persist = new(PersistInjector(
+				const persist = new(injectPersist(
 					{
 						"./storageManager": storageManagerForLimit(limit, limit - 1),
 						"./browser": {
@@ -725,7 +724,7 @@ describe("Persist", () => {
 				});
 				const mockHistory = mockModules["./browser"].history;
 				const mockLocation = mockModules["./browser"].location;
-				const persist = new(PersistInjector(mockModules))("");
+				const persist = new(injectPersist(mockModules))("");
 
 				for (let i = 2; i <= 8; ++i) {
 					// When
@@ -793,7 +792,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -845,7 +844,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -868,7 +867,7 @@ describe("Persist", () => {
 			mockHistory.pushState({}, "", "/a");
 
 			// remove (a) information
-			PersistInjector(injectPersistModules({
+			injectPersist(injectPersistModules({
 				href: `${INJECT_URL}/a`,
 			}));
 
@@ -903,7 +902,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -967,7 +966,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -1006,7 +1005,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -1031,7 +1030,7 @@ describe("Persist", () => {
 
 			// start(reload)
 			// remove start information
-			PersistInjector(
+			injectPersist(
 				{
 					"./utils": {
 						...utils,
@@ -1053,7 +1052,7 @@ describe("Persist", () => {
 			// Given
 			const mockModules = injectPersistModules();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = PersistInjector(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
@@ -1081,7 +1080,7 @@ describe("Persist", () => {
 
 			// start(reload)
 			// remove start information
-			PersistInjector(
+			injectPersist(
 				{
 					"./utils": {
 						...utils,

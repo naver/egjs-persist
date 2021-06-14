@@ -1,3 +1,4 @@
+import PersistInjector from "inject-loader!../../src/Persist";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import UtilsInjector from "inject-loader!../../src/utils";
 import {CONST_PERSIST_STATE, CONST_DEPTHS} from "../../src/consts";
@@ -110,6 +111,9 @@ export function injectPersistModules({
 			"./browser": mockBrowser,
 		}),
 	};
+}
+export function injectPersist(options) {
+	return PersistInjector(options).default;
 }
 
 export function storageManagerForLimit(limit, limit2) {
