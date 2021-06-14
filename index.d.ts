@@ -24,6 +24,6 @@ declare module "@egjs/persist" {
 		 */
 		 public remove(path: string): this;
 	}
-
+	export declare function updateDepth(type?: number): void;
 	export default Persist;
 }
