@@ -33,6 +33,78 @@ The following command shows how to install egjs-persist using npm.
 $ npm install @egjs/persist
 ```
 
+## How to use
+```js
+import Persist from "@egjs/persist";
+
+const persist = new Persist(key);
+
+// Get information about that page.
+const aInfo = persist.get("a");
+
+// Set information about that page.
+persist.set("a", "aa");
+
+// Remove information about that page.
+persist.remove("a");
+```
+
+### Used in SPA
+
+We cannot detect changes in history. The entity using the SPA must respond to changes.
+
+#### Vanilla
+```js
+import { updateDepth } from "@egjs/persist";
+
+const orgPushState = history.pushState;
+
+// change pushState function
+Object.defineProperty(history, "pushState", {
+    configurable: true,
+    value: (...args) => {
+        orgPushState.call(history, ...args);
+        updateDepth();
+    },
+});
+
+// or
+history.pushState("/aa", "title", {});
+updateDepth();
+```
+
+#### React
+```jsx
+import React, { useEffect } from "react";
+import { Router } from "react-router-dom";
+import { createBrowserHistory } from "history";
+import { updateDepth } from "@egjs/persist";
+
+const customHistory = createBrowserHistory();
+
+export default function App() {
+    useEffect(() => customHistory.listen(() => {
+        updateDepth();
+    }), []);
+    return (
+    <Router history={customHistory}>
+        ...
+    </Router>
+  );
+}
+```
+
+#### Vue
+```js
+import VueRouter from "vue-router";
+import { updateDepth } from "@egjs/persist";
+
+const router = new VueRouter();
+
+router.afterEach(() => {
+    updateDepth();
+});
+```
 
 ## Supported Browsers
 The following are the supported browsers.
