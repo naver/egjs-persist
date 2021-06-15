@@ -2,7 +2,7 @@ const {esm, umds} = require("./rollup/config");
 
 export default [
 	...umds({
-		input: "src/Persist.js",
+		input: "src/index.umd.js",
 		library: "eg.Persist",
 		outputs: [
 			"./dist/persist.js",

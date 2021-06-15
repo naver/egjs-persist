@@ -52,7 +52,7 @@ function setPersistState(key, value) {
 function getPersistState(key) {
 	return getStateByKey(CONST_PERSIST_STATE, key);
 }
-function updateDepth(type) {
+function updateDepth(type = 0) {
 	const url = getUrl();
 
 	if (currentUrl === url) {
@@ -291,4 +291,9 @@ class Persist {
 
 // If navigation's type is not TYPE_BACK_FORWARD, delete information about current url.
 updateDepth(getNavigationType());
+
+export {
+	updateDepth,
+};
+
 export default Persist;
