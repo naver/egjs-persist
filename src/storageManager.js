@@ -2,6 +2,7 @@ import {window, history, location, sessionStorage, localStorage} from "./browser
 import {CONST_PERSIST} from "./consts";
 
 const isSupportState = history && "replaceState" in history && "state" in history;
+let storageType = "None";
 
 function isStorageAvailable(storage) {
 	if (!storage) {
@@ -26,8 +27,12 @@ const storage = (function() {
 
 	if (isStorageAvailable(sessionStorage)) {
 		strg = sessionStorage;
+		storageType = "SessionStorage";
 	} else if (isStorageAvailable(localStorage)) {
 		strg = localStorage;
+		storageType = "LocalStorage";
+	} else if (history.state) {
+		storageType = "History";
 	}
 
 	return strg;
@@ -38,10 +43,6 @@ function warnInvalidStorageValue() {
 	console.warn("window.history or session/localStorage has no valid " +
 			"format data to be handled in persist.");
 	/* eslint-enable no-console */
-}
-
-function getStorage() {
-	return storage;
 }
 
 /*
@@ -91,20 +92,6 @@ function getState(key) {
 	return state;
 }
 
-function getStateByKey(key, valueKey) {
-	if (!isSupportState && !storage) {
-		return undefined;
-	}
-
-	let result = getState(key)[valueKey];
-
-	// some device returns "null" or undefined
-	if (result === "null" || typeof result === "undefined") {
-		result = null;
-	}
-	return result;
-}
-
 /*
  * Set state value
  */
@@ -142,7 +129,30 @@ function setState(key, state) {
 	state ? window[CONST_PERSIST] = true : delete window[CONST_PERSIST];
 }
 
-function setStateByKey(key, valueKey, data) {
+
+export function getStorage() {
+	return storage;
+}
+
+export function getStorageType() {
+	return storageType;
+}
+
+export function getStateByKey(key, valueKey) {
+	if (!isSupportState && !storage) {
+		return undefined;
+	}
+
+	let result = getState(key)[valueKey];
+
+	// some device returns "null" or undefined
+	if (result === "null" || typeof result === "undefined") {
+		result = null;
+	}
+	return result;
+}
+
+export function setStateByKey(key, valueKey, data) {
 	if (!isSupportState && !storage) {
 		return;
 	}
@@ -156,13 +166,6 @@ function setStateByKey(key, valueKey, data) {
 /*
  * flush current history state
  */
-function reset(key) {
+export function reset(key) {
 	setState(key, null);
 }
-
-export {
-	reset,
-	setStateByKey,
-	getStateByKey,
-	getStorage,
-};

@@ -24,6 +24,13 @@ declare module "@egjs/persist" {
 		 */
 		 public remove(path: string): this;
 	}
+
+	export declare class PersistQuotaExceededError extends Error {
+		public name: string;
+		public storageType: "SessionStorage" | "LocalStorage" | "History" | "None";
+		public key: string;
+		public size: number;
+	}
 	export declare function updateDepth(type?: number): void;
 	export default Persist;
 }
