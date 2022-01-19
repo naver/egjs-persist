@@ -298,7 +298,14 @@ class Persist {
 if ("onpopstate" in window) {
 	window.addEventListener("popstate", () => {
 		// popstate event occurs when backward or forward
-		updateDepth(TYPE_BACK_FORWARD);
+		try {
+			updateDepth(TYPE_BACK_FORWARD);
+		} catch (e) {
+			// Global function calls prevent errors.
+			if (!isQuotaExceededError(e)) {
+				throw e;
+			}
+		}
 	});
 }
 
