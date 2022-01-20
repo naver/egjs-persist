@@ -51,7 +51,7 @@ class PersistQuotaExceededError extends Error {
 			values = values.sort((a, b) => b.size - a.size).slice(0, 3);
 
 			if (values.length) {
-				valuesText = ` The high-size values of ${storageType} are ${values.map(item => JSON.stringify(item)).join(", ")}.`;
+				valuesText = ` The highest values of ${storageType} are ${values.map(item => JSON.stringify({[item.key]: item.size})).join(", ")}.`;
 			}
 		}
 
