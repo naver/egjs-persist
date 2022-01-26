@@ -49,6 +49,36 @@ persist.set("a", "aa");
 persist.remove("a");
 ```
 
+### Handle the error 
+If the information stored in Persist exceeds the storage quota, a `PersistQuotaExceededError` error occurs.
+
+The template of the error message is as follows.
+```
+Uncaught PersistQuotaExceededError: Setting the value (size: 000) of 'Key' exceeded the SessionStorage's quota. The highest values of SessionStorage are {"key0":0}, {"key1":0}, {"key2":0}.
+```
+If you handle the error, you can check the storage information, the key you want to save, and the size of the information.
+```js
+import Persist, { PersistQuotaExceededError } from "@egjs/persist";
+
+const persist = new Persist(key);
+
+try {
+    // Get information about that page.
+    const aInfo = persist.get("a");
+
+    // Set information about that page.
+    persist.set("a", "aa");
+
+    // Remove information about that page.
+    persist.remove("a");
+} catch (e) {
+    if (e instanceof PersistQuotaExceededError) {
+        console.log(e.key, e.size);
+    }
+}
+```
+
+
 ### Used in SPA
 
 We cannot detect changes in history. The entity using the SPA must respond to changes.
