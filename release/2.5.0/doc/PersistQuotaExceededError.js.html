@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Source: PersistQuotaExceededError.js | egjs::persist - API</title>
+    
+    <meta name="description" content="Provide cache interface to handle persisted data among history navigation." />
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <link rel="canonical" href="http://naver.github.io/egjs-persist/release/latest/doc/"/>
+    
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jaguar.css">
+    
+    
+    <script>
+    var config = {"monospaceLinks":true,"cleverLinks":true,"default":{"outputSourceFiles":true},"applicationName":"eg.Persist","disqus":"egjs","googleAnalytics":"UA-70842526-19","openGraph":{"title":"","type":"website","image":"","site_name":"","url":""},"meta":{"title":"egjs::persist - API","description":"Provide cache interface to handle persisted data among history navigation.","keyword":""},"linenums":true,"link":{"canonical":"http://naver.github.io/egjs-persist/release/latest/doc/"}};
+    </script>
+    
+
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', config.googleAnalytics]);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+<body>
+<div id="wrap" class="clearfix">
+    
+<div class="navigation">
+    <h3 class="applicationName">
+        <a href="//naver.github.io/egjs/"><img style="width:40px; height:20px;" src="img/type_white.svg"/></a>
+        <a href="//naver.github.io/egjs-persist/">Persist</a>
+    </h3>
+
+    <div class="search">
+        <input id="search" type="text" class="form-control input-sm" placeholder="Search Documentations">
+    </div>
+    <ul class="list">
+        <li class="item">
+            <span class="title">
+                <a href="index.html">README</a>
+            </span>
+        </li>
+    
+        <!-- Non Grouping Version -->
+        
+            
+
+<li class="item" data-name="eg.Persist">
+    <span class="title">
+        <a href="eg.Persist.html">eg.Persist</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    <span class="subtitle">Methods</span>
+    
+        <li data-name="eg.Persist.clear"><a href="eg.Persist.html#.clear">clear</a></li>
+    
+        <li data-name="eg.Persist.isNeeded"><a href="eg.Persist.html#.isNeeded">isNeeded</a></li>
+    
+        <li data-name="eg.Persist#get"><a href="eg.Persist.html#get">get</a></li>
+    
+        <li data-name="eg.Persist#remove"><a href="eg.Persist.html#remove">remove</a></li>
+    
+        <li data-name="eg.Persist#set"><a href="eg.Persist.html#set">set</a></li>
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+            
+
+<li class="item" data-name="PersistQuotaExceededError">
+    <span class="title">
+        <a href="PersistQuotaExceededError.html">PersistQuotaExceededError</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+    
+    </ul>
+</div>
+
+    <div class="main">
+        <h1 class="page-title" data-filename="PersistQuotaExceededError.js.html">Source: PersistQuotaExceededError.js</h1>
+        
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {getStorage, getStorageType} from "./storageManager";
+
+const setPrototypeOf = Object.setPrototypeOf || ((obj, proto) => {
+	// eslint-disable-next-line no-proto
+	obj.__proto__ = proto;
+	return obj;
+});
+
+
+/**
+ * Special type of known error that {@link Persist} throws.
+ * @ko Persist 내부에서 알려진 오류 발생시 throw되는 에러
+ * @property {string} key Error key &lt;ko>에러가 되는 키&lt;/ko>
+ * @property {string} message Error message &lt;ko>에러 메시지&lt;/ko>
+ * @property {"SessionStorage" | "LocalStorage" | "History" | "None"} storageType The storage type in which the error occurred &lt;ko>에러가 발생한 스토리지 타입&lt;/ko>
+ * @property {number} size The size of the value in which the error occurred &lt;ko>에러가 발생한 값의 사이즈&lt;/ko>
+ * @property {Object} values Values of high size in storage. (maxLengh: 3) &lt;ko>스토리지의 높은 사이즈의 값들. (최대 3개)&lt;/ko>
+ * @example
+ * ```ts
+ * import Persist, { PersistQuotaExceededError } from "@egjs/persist";
+ * try {
+ *   const persist = new Persist("key");
+ * } catch (e) {
+ *   if (e instanceof PersistQuotaExceededError) {
+ *     console.error("size", e.size);
+ *   }
+ * }
+ * ```
+ */
+class PersistQuotaExceededError extends Error {
+	/**
+	 * @param key Error message&lt;ko>에러 메시지&lt;/ko>
+	 * @param value Error value&lt;ko>에러 값&lt;/ko>
+	 */
+	constructor(key, value) {
+		const size = value.length;
+		const storageType = getStorageType();
+		const storage = getStorage();
+		let valuesText = "";
+		let values = [];
+
+		if (storage) {
+			const length = storage.length;
+
+			for (let i = 0; i &lt; length; ++i) {
+				const itemKey = storage.key(i);
+				const item = storage.getItem(itemKey) || "";
+
+				values.push({key: itemKey, size: item.length});
+			}
+			values = values.sort((a, b) => b.size - a.size).slice(0, 3);
+
+			if (values.length) {
+				valuesText = ` The highest values of ${storageType} are ${values.map(item => JSON.stringify({[item.key]: item.size})).join(", ")}.`;
+			}
+		}
+
+		super(`Setting the value (size: ${size}) of '${key}' exceeded the ${storageType}'s quota.${valuesText}`);
+
+		setPrototypeOf(this, PersistQuotaExceededError.prototype);
+		this.name = "PersistQuotaExceededError";
+		this.storageType = storageType;
+		this.key = key;
+		this.size = size;
+		this.values = values;
+	}
+}
+
+export default PersistQuotaExceededError;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+
+        
+        <!-- disqus code -->
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        <!-- // disqus code -->
+        
+
+        <footer>
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Wed Jan 26 2022 11:12:59 GMT+0900 (대한민국 표준시)
+        </footer>
+    </div>
+</div>
+<script>prettyPrint();</script>
+<script src="scripts/main.js"></script>
+</body>
+</html>

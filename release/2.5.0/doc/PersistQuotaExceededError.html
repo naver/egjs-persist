@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Class: PersistQuotaExceededError | egjs::persist - API</title>
+    
+    <meta name="description" content="Provide cache interface to handle persisted data among history navigation." />
+    
+    
+    
+    <meta property="og:title" content=""/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:image" content=""/>
+    
+    <meta property="og:url" content=""/>
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <link rel="canonical" href="http://naver.github.io/egjs-persist/release/latest/doc/"/>
+    
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/jaguar.css">
+    
+    
+    <script>
+    var config = {"monospaceLinks":true,"cleverLinks":true,"default":{"outputSourceFiles":true},"applicationName":"eg.Persist","disqus":"egjs","googleAnalytics":"UA-70842526-19","openGraph":{"title":"","type":"website","image":"","site_name":"","url":""},"meta":{"title":"egjs::persist - API","description":"Provide cache interface to handle persisted data among history navigation.","keyword":""},"linenums":true,"link":{"canonical":"http://naver.github.io/egjs-persist/release/latest/doc/"}};
+    </script>
+    
+
+    
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', config.googleAnalytics]);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+    
+</head>
+<body>
+<div id="wrap" class="clearfix">
+    
+<div class="navigation">
+    <h3 class="applicationName">
+        <a href="//naver.github.io/egjs/"><img style="width:40px; height:20px;" src="img/type_white.svg"/></a>
+        <a href="//naver.github.io/egjs-persist/">Persist</a>
+    </h3>
+
+    <div class="search">
+        <input id="search" type="text" class="form-control input-sm" placeholder="Search Documentations">
+    </div>
+    <ul class="list">
+        <li class="item">
+            <span class="title">
+                <a href="index.html">README</a>
+            </span>
+        </li>
+    
+        <!-- Non Grouping Version -->
+        
+            
+
+<li class="item" data-name="eg.Persist">
+    <span class="title">
+        <a href="eg.Persist.html">eg.Persist</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    <span class="subtitle">Methods</span>
+    
+        <li data-name="eg.Persist.clear"><a href="eg.Persist.html#.clear">clear</a></li>
+    
+        <li data-name="eg.Persist.isNeeded"><a href="eg.Persist.html#.isNeeded">isNeeded</a></li>
+    
+        <li data-name="eg.Persist#get"><a href="eg.Persist.html#get">get</a></li>
+    
+        <li data-name="eg.Persist#remove"><a href="eg.Persist.html#remove">remove</a></li>
+    
+        <li data-name="eg.Persist#set"><a href="eg.Persist.html#set">set</a></li>
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+            
+
+<li class="item" data-name="PersistQuotaExceededError">
+    <span class="title">
+        <a href="PersistQuotaExceededError.html">PersistQuotaExceededError</a>
+        
+    </span>
+    <ul class="members itemMembers expends">
+    
+    </ul>
+    <ul class="typedefs itemMembers expends">
+    
+    </ul>
+    <ul class="methods itemMembers expends">
+    
+    </ul>
+    <ul class="events itemMembers expends">
+    
+    </ul>
+
+    
+</li>
+
+        
+    
+    </ul>
+</div>
+
+    <div class="main">
+        <h1 class="page-title" data-filename="PersistQuotaExceededError.html">Class: PersistQuotaExceededError</h1>
+        
+
+
+
+<section>
+
+<header>
+    <h2>
+    
+        <span>PersistQuotaExceededError</span>
+        
+    </h2>
+    <button id="toggle">
+        
+            English
+        
+    </button>
+</header>
+
+<article>
+    <div class="container-overview">
+    
+
+    
+        
+<dt>
+    <div class="nameContainer">
+        <h4 class="name" id="PersistQuotaExceededError">
+            
+            new PersistQuotaExceededError<span class="signature">(key, value)</span>
+        </h4>
+    
+        
+        <div class="tag-source">
+            <a href="PersistQuotaExceededError.js.html">PersistQuotaExceededError.js</a>, <a href="PersistQuotaExceededError.js.html#line30">line 30</a>
+        </div>
+        
+    </div>
+
+    
+</dt>
+<dd>
+    
+    
+	<div class="description en">
+		<p>Special type of known error that <code>Persist</code> throws.</p>
+	</div>
+	
+	
+	<div class="description ko">
+		<p>Persist 내부에서 알려진 오류 발생시 throw되는 에러</p>
+	</div>
+	
+
+    
+    
+    
+    
+    
+        
+
+<ul class="parameters">
+    
+    <li>
+        <!-- parameter name -->
+        <div>
+            <strong>key</strong>
+            
+
+            
+        </div>
+        <!-- parameter type -->
+        
+    
+        <!-- Description -->
+        <div>
+            
+            <div class="description en"><p>Error message</p></div>
+            <div class="description ko"><p>에러 메시지</p></div>
+            
+        </div>
+
+        <!-- Sub parameters -->
+        
+    </li>
+    
+    <li>
+        <!-- parameter name -->
+        <div>
+            <strong>value</strong>
+            
+
+            
+        </div>
+        <!-- parameter type -->
+        
+    
+        <!-- Description -->
+        <div>
+            
+            <div class="description en"><p>Error value</p></div>
+            <div class="description ko"><p>에러 값</p></div>
+            
+        </div>
+
+        <!-- Sub parameters -->
+        
+    </li>
+    
+</ul>
+    
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+        <h5>Example</h5>
+        
+
+    
+    <pre class="prettyprint"><code><pre class="prettyprint source lang-ts"><code>import Persist, { PersistQuotaExceededError } from &quot;@egjs/persist&quot;;
+try {
+  const persist = new Persist(&quot;key&quot;);
+} catch (e) {
+  if (e instanceof PersistQuotaExceededError) {
+    console.error(&quot;size&quot;, e.size);
+  }
+}
+</code></pre></code></pre>
+    
+
+    
+
+    
+<dl class="details">
+    
+        <h5 class="subsection-title">Properties:</h5>
+
+        <dl>
+
+<table class="props">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">
+                
+                <div class="en"><p>Error key </p></div>
+                <div class="ko"><p>에러가 되는 키</p></div>
+                
+
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">
+                
+                <div class="en"><p>Error message </p></div>
+                <div class="ko"><p>에러 메시지</p></div>
+                
+
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>storageType</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">"SessionStorage"</span>
+|
+
+<span class="param-type">"LocalStorage"</span>
+|
+
+<span class="param-type">"History"</span>
+|
+
+<span class="param-type">"None"</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">
+                
+                <div class="en"><p>The storage type in which the error occurred </p></div>
+                <div class="ko"><p>에러가 발생한 스토리지 타입</p></div>
+                
+
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>size</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">
+                
+                <div class="en"><p>The size of the value in which the error occurred </p></div>
+                <div class="ko"><p>에러가 발생한 값의 사이즈</p></div>
+                
+
+                </td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>values</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">
+                
+                <div class="en"><p>Values of high size in storage. (maxLengh: 3) </p></div>
+                <div class="ko"><p>스토리지의 높은 사이즈의 값들. (최대 3개)</p></div>
+                
+
+                </td>
+        </tr>
+	
+	
+	</tbody>
+</table></dl>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    <!-- if data.codepen -->
+</dl>
+
+</dd>
+
+
+
+        
+
+
+    
+    </div>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+        
+        <!-- disqus code -->
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="//disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        <!-- // disqus code -->
+        
+
+        <footer>
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> on Wed Jan 26 2022 11:12:59 GMT+0900 (대한민국 표준시)
+        </footer>
+    </div>
+</div>
+<script>prettyPrint();</script>
+<script src="scripts/main.js"></script>
+</body>
+</html>
