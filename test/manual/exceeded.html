@@ -1,0 +1,14 @@
+<script src="../../dist/persist.js"></script>
+
+<script>
+
+	const texts = [];
+	const persist = new eg.Persist("");
+
+	sessionStorage.setItem("why?", "AAAA");
+	for (let i = 0; i < 1000000; ++i) {
+		texts.push(`asdasdasdasdasdasd`);
+	}
+
+	persist.set("a", texts.join(""));
+</script>

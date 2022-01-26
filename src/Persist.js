@@ -5,7 +5,8 @@ import {
 	getStateByKey,
 	getStorage,
 } from "./storageManager";
-import {isNeeded, getUrl, getStorageKey, getNavigationType} from "./utils";
+import PersistQuotaExceededError from "./PersistQuotaExceededError";
+import {isNeeded, getUrl, getStorageKey, getNavigationType, isQuotaExceededError} from "./utils";
 import {console, window} from "./browser";
 import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "./consts";
 
@@ -37,15 +38,12 @@ function setPersistState(key, value) {
 	try {
 		setStateByKey(CONST_PERSIST_STATE, key, value);
 	} catch (e) {
-		if (clearFirst()) {
+		if (catchQuotaExceededError(e, CONST_PERSIST_STATE, value)) {
 			if (key === CONST_LAST_URL) {
 				setPersistState(key, value);
 			} else if (key === CONST_DEPTHS) {
 				setPersistState(key, value && value.slice(1));
 			}
-		} else {
-			// There is no more size to fit in.
-			throw e;
 		}
 	}
 }
@@ -59,38 +57,56 @@ function updateDepth(type = 0) {
 		return;
 	}
 	// url is not the same for the first time, pushState, or replaceState.
-	currentUrl = url;
-	const depths = getPersistState(CONST_DEPTHS) || [];
+	const prevUrl = currentUrl;
 
-	if (type === TYPE_BACK_FORWARD) {
-		// Change current url only
-		const currentIndex = depths.indexOf(currentUrl);
+	try {
+		currentUrl = url;
+		const depths = getPersistState(CONST_DEPTHS) || [];
 
-		~currentIndex && setPersistState(CONST_LAST_URL, currentUrl);
+		if (type === TYPE_BACK_FORWARD) {
+			// Change current url only
+			const currentIndex = depths.indexOf(url);
+
+			~currentIndex && setPersistState(CONST_LAST_URL, url);
+		} else {
+			const prevLastUrl = getPersistState(CONST_LAST_URL);
+
+			reset(getStorageKey(url));
+
+			if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
+				// Remove all url lists with higher index than current index
+				const prevLastIndex = depths.indexOf(prevLastUrl);
+				const removedList = depths.splice(prevLastIndex + 1, depths.length);
+
+				removedList.forEach(removedUrl => {
+					reset(getStorageKey(removedUrl));
+				});
+				// If the type is NAVIGATE and there is information about current url, delete it.
+				const currentIndex = depths.indexOf(url);
+
+				~currentIndex && depths.splice(currentIndex, 1);
+			}
+			// Add depth for new address.
+			if (depths.indexOf(url) < 0) {
+				depths.push(url);
+			}
+			setPersistState(CONST_DEPTHS, depths);
+			setPersistState(CONST_LAST_URL, url);
+		}
+	} catch (e) {
+		// revert currentUrl
+		currentUrl = prevUrl;
+		throw e;
+	}
+}
+
+function catchQuotaExceededError(e, key, value) {
+	if (clearFirst()) {
+		return true;
+	} else if (isQuotaExceededError(e)) {
+		throw new PersistQuotaExceededError(key, value ? JSON.stringify(value) : "");
 	} else {
-		const prevLastUrl = getPersistState(CONST_LAST_URL);
-
-		reset(getStorageKey(currentUrl));
-
-		if (type === TYPE_NAVIGATE && url !== prevLastUrl) {
-			// Remove all url lists with higher index than current index
-			const prevLastIndex = depths.indexOf(prevLastUrl);
-			const removedList = depths.splice(prevLastIndex + 1, depths.length);
-
-			removedList.forEach(removedUrl => {
-				reset(getStorageKey(removedUrl));
-			});
-			// If the type is NAVIGATE and there is information about current url, delete it.
-			const currentIndex = depths.indexOf(currentUrl);
-
-			~currentIndex && depths.splice(currentIndex, 1);
-		}
-		// Add depth for new address.
-		if (depths.indexOf(url) < 0) {
-			depths.push(url);
-		}
-		setPersistState(CONST_DEPTHS, depths);
-		setPersistState(CONST_LAST_URL, url);
+		throw e;
 	}
 }
 
@@ -117,6 +133,7 @@ function clearFirst() {
 	// Clear the previous record and try to add data again.
 	return true;
 }
+
 function clear() {
 	const depths = getPersistState(CONST_DEPTHS) || [];
 
@@ -127,12 +144,6 @@ function clear() {
 	reset(CONST_PERSIST_STATE);
 
 	currentUrl = "";
-}
-if ("onpopstate" in window) {
-	window.addEventListener("popstate", () => {
-		// popstate event occurs when backward or forward
-		updateDepth(TYPE_BACK_FORWARD);
-	});
 }
 
 /**
@@ -184,7 +195,7 @@ class Persist {
 
 		// find path
 		const urlKey = getStorageKey(getUrl());
-		const globalState =	getStateByKey(urlKey, this.key);
+		const globalState = getStateByKey(urlKey, this.key);
 
 
 		if (!path || path.length === 0) {
@@ -221,7 +232,7 @@ class Persist {
 		// find path
 		const key = this.key;
 		const urlKey = getStorageKey(getUrl());
-		const globalState =	getStateByKey(urlKey, key);
+		const globalState = getStateByKey(urlKey, key);
 
 		try {
 			if (path.length === 0) {
@@ -238,11 +249,8 @@ class Persist {
 				);
 			}
 		} catch (e) {
-			if (clearFirst(e)) {
+			if (catchQuotaExceededError(e, urlKey, value)) {
 				this.set(path, value);
-			} else {
-				// There is no more size to fit in.
-				throw e;
 			}
 		}
 		return this;
@@ -259,7 +267,7 @@ class Persist {
 		// find path
 		const key = this.key;
 		const urlKey = getStorageKey(getUrl());
-		const globalState =	getStateByKey(urlKey, key);
+		const globalState = getStateByKey(urlKey, key);
 
 		try {
 			if (path.length === 0) {
@@ -278,19 +286,38 @@ class Persist {
 				);
 			}
 		} catch (e) {
-			if (clearFirst(e)) {
+			if (catchQuotaExceededError(e)) {
 				this.remove(path);
-			} else {
-				// There is no more size to fit in.
-				throw e;
 			}
 		}
 		return this;
 	}
 }
 
+
+if ("onpopstate" in window) {
+	window.addEventListener("popstate", () => {
+		// popstate event occurs when backward or forward
+		try {
+			updateDepth(TYPE_BACK_FORWARD);
+		} catch (e) {
+			// Global function calls prevent errors.
+			if (!isQuotaExceededError(e)) {
+				throw e;
+			}
+		}
+	});
+}
+
 // If navigation's type is not TYPE_BACK_FORWARD, delete information about current url.
-updateDepth(getNavigationType());
+try {
+	updateDepth(getNavigationType());
+} catch (e) {
+	// Global function calls prevent errors.
+	if (!isQuotaExceededError(e)) {
+		throw e;
+	}
+}
 
 export {
 	updateDepth,

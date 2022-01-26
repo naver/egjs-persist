@@ -5,6 +5,7 @@ import {CONST_PERSIST_STATE, CONST_DEPTHS} from "../../src/consts";
 import * as StorageManager from "../../src/storageManager";
 import * as browser from "../../src/browser";
 
+
 const DEFAULT_HREF = location.href;
 
 export const INJECT_URL = "https://inject.com";
@@ -16,6 +17,14 @@ export function wait(time = 100) {
 			resolve();
 		}, time);
 	});
+}
+
+export function throwQuotaExceedError() {
+	const err = new Error(`Failed to execute 'setItem' on 'Storage': Setting the value of 'URL' exceeded the quota.`);
+
+	err.name = "QuotaExceededError";
+
+	throw err;
 }
 
 export function injectBrowser(href = DEFAULT_HREF) {
@@ -67,6 +76,9 @@ export function injectBrowser(href = DEFAULT_HREF) {
 		history,
 	};
 }
+export function getDepths() {
+	return StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
+}
 export function sessionStorageForLimit(limit, limit2 = limit) {
 	// Compare with limit when adding depth and limit2 when adding value.
 	return {
@@ -79,13 +91,13 @@ export function sessionStorageForLimit(limit, limit2 = limit) {
 				if (key === CONST_PERSIST_STATE) {
 					isExceed = JSON.parse(value || "{depths: []}")[CONST_DEPTHS].length > limit;
 				} else {
-					isExceed = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length > limit2;
+					isExceed = getDepths().length > limit2;
 				}
 			} catch (e) {
 
 			}
 			if (isExceed) {
-				throw new Error("exceed storage");
+				throwQuotaExceedError();
 			}
 			window.sessionStorage.setItem(key, value);
 		},

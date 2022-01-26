@@ -6,7 +6,8 @@ import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist} from "./TestHelper";
+import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist, throwQuotaExceedError, getDepths} from "./TestHelper";
+import { PersistQuotaExceededError } from "../../src";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
 	{
@@ -605,6 +606,11 @@ describe("Persist", () => {
 		const pathname = location.pathname;
 
 		beforeEach(() => {
+			const length = sessionStorage.length;
+
+			for (let i = 0; i < length; ++i) {
+				sessionStorage.removeItem(sessionStorage.key(i));
+			}
 			Persist.clear();
 		});
 		afterEach(() => {
@@ -612,10 +618,9 @@ describe("Persist", () => {
 		});
 
 		it(`test depth test for exceed test (depths limit: 0)`, () => {
-			// Given
 			try {
-				// When
-				new(injectPersist(
+				// Given
+				const persist = new(injectPersist(
 					{
 						"./storageManager": storageManagerForLimit(0),
 						"./browser": {
@@ -624,33 +629,46 @@ describe("Persist", () => {
 						},
 					}
 				))("");
+
+				// When
+				persist.set("a", "");
 			} catch (e) {
 				// Then
 				// An unconditional error occurs.
-				expect(e.message).to.be.equals("exceed storage");
+				expect(e).to.be.an.instanceof(PersistQuotaExceededError);
 				return;
 			}
 			throw new Error("Errors should occur unconditionally, but they ignored them.");
 		});
-		it(`test depth test for exceed test (depths limit: 1, value limit: 0)`, () => {
-			// Given
-			const persist = new(injectPersist(
-				{
-					"./storageManager": storageManagerForLimit(1, 0),
-					"./browser": {
-						window: {},
-						console,
-					},
-				}
-			))("");
-
-			// When
+		it(`should check if other values of sessionStorage are displayed`, () => {
 			try {
-				persist.set("a", 1);
+				// Given
+				const persist = new(injectPersist(
+					{
+						"./storageManager": storageManagerForLimit(0),
+						"./browser": {
+							window: {},
+							console: window,
+						},
+					}
+				))("");
+
+				sessionStorage.setItem("test1", "22");
+				sessionStorage.setItem("test2", "1114");
+
+				// When
+				persist.set("a", "1");
 			} catch (e) {
 				// Then
-				// An unconditional error occurs.
-				expect(e.message).to.be.equals("exceed storage");
+				expect(e).to.be.an.instanceof(PersistQuotaExceededError);
+				expect(e.message).to.have.string("test1");
+				expect(e.message).to.have.string("test2");
+				// 0: tmp__state__
+				expect(e.values[1].key).to.be.equals("test2");
+				expect(e.values[1].size).to.be.equals(4);
+
+				expect(e.values[2].key).to.be.equals("test1");
+				expect(e.values[2].size).to.be.equals(2);
 				return;
 			}
 			throw new Error("Errors should occur unconditionally, but they ignored them.");
@@ -675,7 +693,7 @@ describe("Persist", () => {
 					persist.set("a", "1");
 
 					// Then
-					const state1 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+					const state1 = getDepths().length;
 
 					expect(state1).to.be.equals(limit - 1);
 
@@ -684,7 +702,7 @@ describe("Persist", () => {
 					persist.set("a", "1");
 
 					// Then
-					const state2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+					const state2 = getDepths().length;
 
 					expect(state2).to.be.equals(limit - 1);
 				} else {
@@ -698,7 +716,7 @@ describe("Persist", () => {
 						// start, a0
 						// start, a0 , a1
 						// a0 , a1, a2
-						const state = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+						const state = getDepths().length;
 
 						expect(state).to.be.equals(j + 2);
 					}
@@ -710,7 +728,7 @@ describe("Persist", () => {
 					persist.set("a", 1);
 
 					// Then
-					const currentState = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
+					const currentState = getDepths().length;
 
 					expect(currentState).to.be.equals(limit - 1);
 				}

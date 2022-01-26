@@ -1,6 +1,7 @@
-import Persist, {updateDepth} from "./Persist";
+import Persist, * as modules from "./index";
 
-// eslint-disable-next-line import/no-named-as-default-member
-Persist.updateDepth = updateDepth;
+for (const name in modules) {
+	Persist[name] = modules[name];
+}
 
 export default Persist;
