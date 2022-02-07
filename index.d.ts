@@ -3,6 +3,11 @@ declare module "@egjs/persist" {
 
 	class Persist {
 		/**
+		 * Clear all information in Persist
+		 */
+		public static clear(): void;
+
+		/**
 		 * Return whether you need "Persist" module by checking the bfCache support of the current browser
 		 */
 		public static isNeeded(): boolean;
