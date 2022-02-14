@@ -16,6 +16,7 @@
 		"lint": "eslint src",
 		"jsdoc": "rm -rf ./doc && jsdoc -c jsdoc.json",
 		"coverage": "karma start --coverage",
+    "test:node": "node ./dist/persist.js",
 		"release": "node config/release.js",
 		"demo:start": "npm run demo:prebuild-latest && npm run demo:updateVersion && jekyll serve --host=0.0.0.0 -s demo",
 		"demo:build": "npm run demo:updateVersion && jekyll build -s demo",
