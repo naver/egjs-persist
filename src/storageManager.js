@@ -31,7 +31,7 @@ const storage = (function() {
 	} else if (isStorageAvailable(localStorage)) {
 		strg = localStorage;
 		storageType = "LocalStorage";
-	} else if (history.state) {
+	} else if (history && history.state) {
 		storageType = "History";
 	}
 
