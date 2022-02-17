@@ -1,6 +1,6 @@
 {
 	"name": "@egjs/persist",
-	"version": "2.5.1-snapshot",
+	"version": "2.5.2",
 	"description": "Provide cache interface to handle persisted data among history navigation.",
 	"main": "dist/persist.js",
 	"module": "dist/persist.esm.js",
@@ -16,7 +16,7 @@
 		"lint": "eslint src",
 		"jsdoc": "rm -rf ./doc && jsdoc -c jsdoc.json",
 		"coverage": "npm run simulate:node && karma start --coverage",
-    "simulate:node": "npm run build && node ./dist/persist.js",
+		"simulate:node": "npm run build && node ./dist/persist.js",
 		"release": "node config/release.js",
 		"demo:start": "npm run demo:prebuild-latest && npm run demo:updateVersion && jekyll serve --host=0.0.0.0 -s demo",
 		"demo:build": "npm run demo:updateVersion && jekyll build -s demo",
