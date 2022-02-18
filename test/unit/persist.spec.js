@@ -6,7 +6,7 @@ import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist, throwQuotaExceedError, getDepths} from "./TestHelper";
+import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist, injectPersistExports, getDepths} from "./TestHelper";
 import { PersistQuotaExceededError } from "../../src";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
@@ -1116,6 +1116,47 @@ describe("Persist", () => {
 			expect(length3).to.be.equals(3);
 			expect(length4).to.be.equals(3);
 			expect(length5).to.be.equals(3);
+		});
+		it("should check remove 'b' depth when replaceDepth for start -> a -> b -> c(replace)", () => {
+			// Given
+			const mockModules = injectPersistModules();
+			const mockHistory = mockModules["./browser"].history;
+			const InjectedPersist = injectPersistExports(mockModules);
+			const persist = new InjectedPersist.default("");
+
+			InjectedPersist.default.clear();
+
+			// When
+			// start
+			persist.set("0", 1);
+
+			// a
+			mockHistory.pushState({}, "", "/a");
+
+			persist.set("a", 1);
+
+			// b
+			mockHistory.pushState({}, "", "/b");
+
+			persist.set("b", 1);
+
+			// c (replace)
+			mockHistory.replaceState({}, "", "/c");
+
+			InjectedPersist.replaceDepth();
+
+
+			// start -> a(x) -> c
+			const depths = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS);
+
+			// Then
+			expect(depths.length).to.be.equals(3);
+			// start
+			expect(depths[0].lastIndexOf(pathname)).to.be.equals(depths[0].length - pathname.length);
+			// a
+			expect(depths[1].lastIndexOf("a")).to.be.equals(depths[1].length - 1);
+			// c
+			expect(depths[2].lastIndexOf("c")).to.be.equals(depths[2].length - 1);
 		});
 	});
 });
