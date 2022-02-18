@@ -85,11 +85,11 @@ We cannot detect changes in history. The entity using the SPA must respond to ch
 
 #### Vanilla
 ```js
-import { updateDepth } from "@egjs/persist";
+import { updateDepth, replaceDepth } from "@egjs/persist";
 
+// use pushState function
 const orgPushState = history.pushState;
 
-// change pushState function
 Object.defineProperty(history, "pushState", {
     configurable: true,
     value: (...args) => {
@@ -101,6 +101,22 @@ Object.defineProperty(history, "pushState", {
 // or
 history.pushState("/aa", "title", {});
 updateDepth();
+
+// use replaceState function
+const orgReplaceState = history.replaceState;
+
+Object.defineProperty(history, "replaceState", {
+    configurable: true,
+    value: (...args) => {
+        orgReplaceState.call(history, ...args);
+        replaceState();
+    },
+});
+
+// or
+history.replaceState("/aa", "title", {});
+replaceDepth();
+
 ```
 
 #### React
