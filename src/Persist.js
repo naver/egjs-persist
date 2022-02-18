@@ -50,6 +50,47 @@ function setPersistState(key, value) {
 function getPersistState(key) {
 	return getStateByKey(CONST_PERSIST_STATE, key);
 }
+
+function replaceDepth() {
+	const url = getUrl();
+
+	if (currentUrl === url) {
+		return;
+	}
+	const prevUrl = currentUrl;
+
+	try {
+		currentUrl = url;
+
+		const depths = getPersistState(CONST_DEPTHS) || [];
+
+		// remove prev url
+		const prevIndex = depths.indexOf(prevUrl);
+
+		if (prevIndex >= 0) {
+			depths.splice(prevIndex, 1);
+			reset(getStorageKey(prevUrl));
+		}
+
+		// remove next url info
+		const currentIndex = depths.indexOf(url);
+
+		if (currentIndex >= 0) {
+			depths.splice(currentIndex, 1);
+			reset(getStorageKey(url));
+		}
+
+		console.log(url);
+		depths.push(url);
+		setPersistState(CONST_DEPTHS, depths);
+		setPersistState(CONST_LAST_URL, url);
+	} catch (e) {
+		// revert currentUrl
+		currentUrl = prevUrl;
+		throw e;
+	}
+}
+
 function updateDepth(type = 0) {
 	const url = getUrl();
 
@@ -321,6 +362,7 @@ try {
 
 export {
 	updateDepth,
+	replaceDepth,
 };
 
 export default Persist;
