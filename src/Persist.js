@@ -80,7 +80,6 @@ function replaceDepth() {
 			reset(getStorageKey(url));
 		}
 
-		console.log(url);
 		depths.push(url);
 		setPersistState(CONST_DEPTHS, depths);
 		setPersistState(CONST_LAST_URL, url);

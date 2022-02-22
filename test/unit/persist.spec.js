@@ -1152,11 +1152,11 @@ describe("Persist", () => {
 			// Then
 			expect(depths.length).to.be.equals(3);
 			// start
-			expect(depths[0].lastIndexOf(pathname)).to.be.equals(depths[0].length - pathname.length);
+			expect(new RegExp(`${pathname}$`, "g").test(depths[0])).to.be.true;
 			// a
-			expect(depths[1].lastIndexOf("a")).to.be.equals(depths[1].length - 1);
+			expect(/\/a$/g.test(depths[1])).to.be.true;
 			// c
-			expect(depths[2].lastIndexOf("c")).to.be.equals(depths[2].length - 1);
+			expect(/\/c$/g.test(depths[2])).to.be.true;
 		});
 	});
 });
