@@ -37,5 +37,6 @@ declare module "@egjs/persist" {
 		public size: number;
 	}
 	export function updateDepth(type?: number): void;
+	export function replaceDepth(): void;
 	export default Persist;
 }

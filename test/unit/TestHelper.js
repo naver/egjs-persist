@@ -124,8 +124,12 @@ export function injectPersistModules({
 		}),
 	};
 }
+
+export function injectPersistExports(options) {
+	return PersistInjector(options);
+}
 export function injectPersist(options) {
-	return PersistInjector(options).default;
+	return injectPersistExports(options).default;
 }
 
 export function storageManagerForLimit(limit, limit2) {
