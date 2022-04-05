@@ -1,10 +1,16 @@
-import Persist, {updateDepth, replaceDepth} from "./Persist";
+import Persist from "./Persist";
+import HashPersist from "./HashPersist";
 import PersistQuotaExceededError from "./PersistQuotaExceededError";
 
 
 export {
 	updateDepth,
 	replaceDepth,
+	useHashPersist,
+} from "./historyManager";
+
+export {
+	HashPersist,
 	PersistQuotaExceededError,
 };
 

@@ -1,4 +1,4 @@
-import {navigator, parseFloat, performance, location} from "./browser";
+import {navigator, parseFloat, performance, location, console} from "./browser";
 import {CONST_PERSIST} from "./consts";
 
 const userAgent = navigator ? navigator.userAgent : "";
@@ -26,14 +26,43 @@ export function getNavigationType() {
 		performance.navigation.type;
 }
 
+
+export function getHashUrl() {
+	return location ? location.href : "";
+}
+
 export function getUrl() {
-	return location ? location.href.split("#")[0] : "";
+	return getHashUrl().split("#")[0];
 }
 
 export function getStorageKey(name) {
 	return name + CONST_PERSIST;
 }
 
-export function isQuotaExceededError(e) {
-	return e.name === "QuotaExceededError" || e.name === "PersistQuotaExceededError";
+export function getUrlKey() {
+	return getStorageKey(getUrl());
+}
+
+export function execRec(obj, path, func) {
+	let _obj = obj;
+
+	if (!_obj) {
+		const firstElement = path[0];
+
+		_obj = isNaN(firstElement) || firstElement === "" ? {} : [];
+	}
+
+
+	const head = path.shift();
+
+	if (path.length === 0) {
+		if (_obj instanceof Array && isNaN(head)) {
+			console.warn("Don't use key string on array");
+		}
+		func(_obj, head);
+		return _obj;
+	}
+
+	_obj[head] = execRec(_obj[head], path, func);
+	return _obj;
 }

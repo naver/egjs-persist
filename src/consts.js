@@ -1,8 +1,10 @@
 import {performance, navigator, parseFloat} from "./browser";
 
 export const CONST_PERSIST = "___persist___";
-export const CONST_PERSIST_STATE = `state${CONST_PERSIST}`;
+export const CONST_HASH = `___hash___`;
 export const CONST_DEPTHS = "depths";
+export const CONST_HASH_DEPTHS_PERSIST = `${CONST_HASH}${CONST_DEPTHS}${CONST_PERSIST}`;
+export const CONST_PERSIST_STATE = `state${CONST_PERSIST}`;
 export const CONST_LAST_URL = "lastUrl";
 const navigation = performance && performance.navigation;
 
