@@ -1,5 +1,6 @@
 /* eslint-disable */
 import * as StorageManager from "../../src/storageManager";
+import * as orgBrowser from "../../src/browser";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import { getUrl, getStorageKey } from "../../src/utils";
 
@@ -123,7 +124,7 @@ describe("StorageManager", function() {
     describe("storage value exception", function() {
         const consoleWarn = console.warn;
         afterEach(() => {
-            console.warn = consoleWarn;            
+            console.warn = consoleWarn;
         });
         const storageValues = ['{', '[ 1,2,3 ]', '1', '1.234', '"123"'];
         storageValues.forEach(storageVal => {
@@ -132,24 +133,22 @@ describe("StorageManager", function() {
                 StorageManager.getStorage().setItem(KEY, storageVal);
                 let errorThrown = false;
                 let warningShown = false;
-                console.warn = function () {
-                    warningShown = true;
-                };
 
                 // When
                 try {
                     let MockStorageManager = StorageManagerInjector({
                         "./browser": {
-                            sessionStorage: sessionStorage,
-                            localStorage: localStorage,
-                            history: history,
-                            JSON: JSON,
-                            location: location,
-                            window: window
+							...orgBrowser,
+							console: {
+								warn: () => {
+									warningShown = true;
+								},
+							}
                         }
                     });
                     MockStorageManager.getStateByKey(KEY, "TEST");
                 } catch (e) {
+					console.log(e.message);
                     errorThrown = true;
                 }
 

@@ -1,9 +1,11 @@
 import PersistInjector from "inject-loader!../../src/Persist";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
+import HistoryManagerInjector from "inject-loader!../../src/historyManager";
+import PersistHistoryInjector from "inject-loader!../../src/PersistHistory";
 import UtilsInjector from "inject-loader!../../src/utils";
 import {CONST_PERSIST_STATE, CONST_DEPTHS} from "../../src/consts";
 import * as StorageManager from "../../src/storageManager";
-import * as browser from "../../src/browser";
+import * as orgBrowser from "../../src/browser";
 
 
 const DEFAULT_HREF = location.href;
@@ -27,6 +29,13 @@ export function throwQuotaExceedError() {
 	throw err;
 }
 
+export function clearStorage() {
+	const length = sessionStorage.length;
+
+	for (let i = 0; i < length; ++i) {
+		sessionStorage.removeItem(sessionStorage.key(i));
+	}
+}
 export function injectBrowser(href = DEFAULT_HREF) {
 	const location = {
 		pathname: INJECT_URL,
@@ -71,15 +80,12 @@ export function injectBrowser(href = DEFAULT_HREF) {
 	};
 
 	return {
-		...browser,
+		...orgBrowser,
 		location,
 		history,
 	};
 }
-export function getDepths() {
-	return StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS) || [];
-}
-export function sessionStorageForLimit(limit, limit2 = limit) {
+export function sessionStorageForLimit(depthsLimit, addedLimit = depthsLimit) {
 	// Compare with limit when adding depth and limit2 when adding value.
 	return {
 		removeItem: key => window.sessionStorage.removeItem(key),
@@ -87,14 +93,14 @@ export function sessionStorageForLimit(limit, limit2 = limit) {
 		setItem: (key, value) => {
 			let isExceed = false;
 
+
 			try {
 				if (key === CONST_PERSIST_STATE) {
-					isExceed = JSON.parse(value || "{depths: []}")[CONST_DEPTHS].length > limit;
+					isExceed = JSON.parse(value || "{depths: []}")[CONST_DEPTHS].length > depthsLimit;
 				} else {
-					isExceed = getDepths().length > limit2;
+					isExceed = StorageManager.getDepths().length > addedLimit;
 				}
 			} catch (e) {
-
 			}
 			if (isExceed) {
 				throwQuotaExceedError();
@@ -104,32 +110,60 @@ export function sessionStorageForLimit(limit, limit2 = limit) {
 	};
 }
 
+export function mockPersistModules({
+	browser = {},
+	utils = {},
+}) {
+	const mockedBrowser = {
+		...orgBrowser,
+		...browser,
+	};
+	const mockedUtils = {
+		...UtilsInjector({
+			"./browser": mockedBrowser,
+		}),
+		...utils,
+	};
+	const mockedPersistHistory = PersistHistoryInjector();
+	const mockedStorageManager = StorageManagerInjector({
+		"./browser": mockedBrowser,
+	});
+
+	return {
+		"./browser": mockedBrowser,
+		"./historyManager": HistoryManagerInjector({
+			"./browser": mockedBrowser,
+			"./storageManager": mockedStorageManager,
+			"./utils": mockedUtils,
+			"./PersistHistory": mockedPersistHistory,
+		}),
+		"./storageManager": mockedStorageManager,
+		"./utils": mockedUtils,
+	};
+}
+
 export function injectPersistModules({
 	href = DEFAULT_HREF,
 	sessionLimitCount = -1,
 } = {}) {
-	const mockBrowser = injectBrowser(href);
+	const mockedBrowser = injectBrowser(href);
 
 	if (sessionLimitCount >= 0) {
-		mockBrowser.sessionStorage = sessionStorageForLimit(sessionLimitCount);
+		mockedBrowser.sessionStorage = sessionStorageForLimit(sessionLimitCount);
 	}
-
-	return {
-		"./browser": mockBrowser,
-		"./storageManager": StorageManagerInjector({
-			"./browser": mockBrowser,
-		}),
-		"./utils": UtilsInjector({
-			"./browser": mockBrowser,
-		}),
-	};
+	return mockPersistModules({
+		browser: mockedBrowser,
+	});
 }
 
 export function injectPersistExports(options) {
-	return PersistInjector(options);
+	const nextOptions = {...options};
+
+	delete nextOptions["./browser"];
+	return PersistInjector(nextOptions);
 }
 export function injectPersist(options) {
-	return injectPersistExports(options).default;
+	return injectPersistExports(options);
 }
 
 export function storageManagerForLimit(limit, limit2) {
@@ -146,4 +180,17 @@ export function storageManagerForLimit(limit, limit2) {
 			},
 		}
 	);
+}
+
+export function injectPersistForLimit(depthsLimit, addedLimit) {
+	const storageManager = storageManagerForLimit(depthsLimit, addedLimit);
+	const historyManager = HistoryManagerInjector({
+		"./storageManager": storageManager,
+	});
+
+
+	return injectPersistExports({
+		"./storageManager": storageManager,
+		"./historyManager": historyManager,
+	});
 }
