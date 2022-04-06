@@ -7,6 +7,7 @@ export {
 	updateDepth,
 	replaceDepth,
 	useHashPersist,
+	releaseEvent,
 } from "./historyManager";
 
 export {

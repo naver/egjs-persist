@@ -9,17 +9,14 @@ import {
 	getPersistState,
 } from "./storageManager";
 import PersistHistory from "./PersistHistory";
-import {location, history, document} from "./browser";
+import {location, history, document, window} from "./browser";
 import {getNavigationType, getUrl, getStorageKey, getUrlKey, getHashUrl} from "./utils";
 import {TYPE_BACK_FORWARD, TYPE_NAVIGATE, CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL, CONST_HASH_DEPTHS_PERSIST, CONST_HASH} from "./consts";
 import PersistQuotaExceededError from "./PersistQuotaExceededError";
 
-function getHashDepths() {
-	return getStateByKey(getUrlKey(), CONST_HASH_DEPTHS_PERSIST) || [];
-}
 
-function setHashDepths(depths) {
-	return setStateByKey(getUrlKey(), CONST_HASH_DEPTHS_PERSIST, depths);
+function setHashDepths(depths, key = getUrlKey()) {
+	return setStateByKey(key, CONST_HASH_DEPTHS_PERSIST, depths);
 }
 
 /*
@@ -47,21 +44,67 @@ function resetHash(key, hash) {
 		setState(key, null);
 	}
 }
+function replaceHashDepth() {
+	const prevHash = PersistHistory.hash;
+	const prevUrl = PersistHistory.url;
+	const prevUrlKey = getStorageKey(prevUrl);
+	const prevHashUrl = PersistHistory.hashUrl;
 
-function updateHashDepth(type = 0) {
-	const url = getUrl();
 	const hashUrl = getHashUrl();
 	const urlKey = getUrlKey();
+	const hash = location.hash;
+	const hashLength = history.length;
 
+	if (hashUrl === prevHashUrl) {
+		return;
+	}
+
+	PersistHistory.hash = hash;
+	PersistHistory.hashUrl = hashUrl;
+	PersistHistory.length = hashLength;
+	// remove hash info
+	resetHash(getStorageKey(prevUrl), prevHash);
+
+	// remove prev hash
+	const prevDepths = getHashDepths(prevUrlKey);
+	const prevHashIndex = prevDepths.indexOf(prevHash);
+
+	if (prevHashIndex > -1) {
+		prevDepths.splice(prevHashIndex, 1);
+	}
+	const isSameKey = urlKey === prevUrlKey;
+	const depths = isSameKey ? prevDepths : getHashDepths();
+	const hashIndex = depths.indexOf(hash);
+
+	// remove next hash info
+	if (hashIndex > -1) {
+		resetHash(urlKey, hash);
+		depths.splice(hashIndex, 1);
+	}
+	if (isSameKey) {
+		const addedIndex = hashIndex === -1 || hashIndex > prevHashIndex ?
+			prevHashIndex : prevHashIndex - 1;
+
+		depths.splice(addedIndex, 0, hash);
+	} else {
+		depths.splice(0, 0, hash);
+		setHashDepths(prevDepths, prevUrlKey);
+	}
+
+	// add next hash
+	setHashDepths(depths, urlKey);
+}
+function updateHashDepth(type = 0) {
 	const prevLength = PersistHistory.length;
 	const prevHash = PersistHistory.hash;
 	const prevUrl = PersistHistory.url;
 	const prevHashUrl = PersistHistory.hashUrl;
 
-
+	const url = getUrl();
+	const hashUrl = getHashUrl();
+	const urlKey = getUrlKey();
 	const hash = location.hash;
 	const hashLength = history.length;
-
 
 	let hashType = type;
 
@@ -117,6 +160,9 @@ function updateHashDepth(type = 0) {
 	setHashDepths(depths);
 }
 
+export function getHashDepths(key = getUrlKey()) {
+	return getStateByKey(key, CONST_HASH_DEPTHS_PERSIST) || [];
+}
 
 export function isQuotaExceededError(e) {
 	return e.name === "QuotaExceededError" || e.name === "PersistQuotaExceededError";
@@ -175,7 +221,7 @@ export function replaceDepth() {
 	const url = getUrl();
 
 	if (PersistHistory.useHash) {
-		updateHashDepth();
+		replaceHashDepth();
 	}
 	if (PersistHistory.url === url) {
 		return;
@@ -192,7 +238,7 @@ export function replaceDepth() {
 
 		if (prevIndex >= 0) {
 			depths.splice(prevIndex, 1);
-			reset(getStorageKey(prevUrl));
+			resetHash(getStorageKey(prevUrl));
 		}
 
 		// remove next url info
@@ -200,10 +246,17 @@ export function replaceDepth() {
 
 		if (currentIndex >= 0) {
 			depths.splice(currentIndex, 1);
-			reset(getStorageKey(url));
+			resetHash(getStorageKey(url));
 		}
+		if (prevIndex >= 0) {
+			const addedIndex = currentIndex === -1 || currentIndex > prevIndex ?
+				prevIndex :
+				prevIndex - 1;
 
-		depths.push(url);
+			depths.splice(addedIndex, 0, url);
+		} else {
+			depths.push(url);
+		}
 		trySetPersistState(CONST_DEPTHS, depths);
 		trySetPersistState(CONST_LAST_URL, url);
 	} catch (e) {
@@ -222,7 +275,6 @@ export function updateDepth(type = 0) {
 	if (PersistHistory.url === url) {
 		return;
 	}
-	PersistHistory.length = history.length;
 	// url is not the same for the first time, pushState, or replaceState.
 	const prevUrl = PersistHistory.url;
 
@@ -282,6 +334,8 @@ export function clear() {
 	reset(CONST_PERSIST_STATE);
 
 	PersistHistory.url = "";
+	PersistHistory.hashUrl = "";
+	PersistHistory.hash = null;
 }
 
 export function useHashPersist() {
@@ -292,19 +346,23 @@ export function useHashPersist() {
 	updateHashDepth(getNavigationType());
 }
 
+export function releaseEvent() {
+	window.removeEventListener("popstate", onPopState);
+}
+function onPopState() {
+	// popstate event occurs when backward or forward
+	try {
+		updateDepth(TYPE_BACK_FORWARD);
+	} catch (e) {
+		// Global function calls prevent errors.
+		if (!isQuotaExceededError(e)) {
+			throw e;
+		}
+	}
+}
 // execute global
 if ("onpopstate" in window) {
-	window.addEventListener("popstate", () => {
-		// popstate event occurs when backward or forward
-		try {
-			updateDepth(TYPE_BACK_FORWARD);
-		} catch (e) {
-			// Global function calls prevent errors.
-			if (!isQuotaExceededError(e)) {
-				throw e;
-			}
-		}
-	});
+	window.addEventListener("popstate", onPopState);
 }
 
 // If navigation's type is not TYPE_BACK_FORWARD, delete information about current url.
