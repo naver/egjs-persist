@@ -5,9 +5,10 @@ import {CONST_HASH} from "./consts";
 import Persist from "./Persist";
 
 /**
- * Get or store the current state of the web page using JSON.
- * @ko 웹 페이지의 현재 상태를 JSON 형식으로 저장하거나 읽는다.
- * @alias eg.Persist
+ * Get or store the current state of the web page using JSON according to hash.
+ * @ko 웹 페이지의 현재 상태를 hash에 따라 JSON 형식으로 저장하거나 읽는다.
+ * @memberof eg.Persist
+ * @alias eg.Persist.HashPersist
  * @extends eg.Persist
  *
  * @support {"ie": "9+", "ch" : "latest", "ff" : "latest",  "sf" : "latest" , "edge" : "latest", "ios" : "7+", "an" : "2.3+ (except 3.x)"}
