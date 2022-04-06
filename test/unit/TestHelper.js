@@ -1,4 +1,6 @@
+/* eslint-disable no-use-before-define */
 import PersistInjector from "inject-loader!../../src/Persist";
+import HashPersistInjector from "inject-loader!../../src/HashPersist";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import HistoryManagerInjector from "inject-loader!../../src/historyManager";
 import PersistHistoryInjector from "inject-loader!../../src/PersistHistory";
@@ -6,6 +8,8 @@ import UtilsInjector from "inject-loader!../../src/utils";
 import {CONST_PERSIST_STATE, CONST_DEPTHS} from "../../src/consts";
 import * as StorageManager from "../../src/storageManager";
 import * as orgBrowser from "../../src/browser";
+import PersistHistory from "../../src/PersistHistory";
+import {updateDepth} from "../../src";
 
 
 const DEFAULT_HREF = location.href;
@@ -28,7 +32,12 @@ export function throwQuotaExceedError() {
 
 	throw err;
 }
-
+export function reloadPersist() {
+	PersistHistory.url = "";
+	PersistHistory.hashUrl = "";
+	PersistHistory.hash = null;
+	updateDepth(1);
+}
 export function clearStorage() {
 	const length = sessionStorage.length;
 
@@ -41,10 +50,24 @@ export function injectBrowser(href = DEFAULT_HREF) {
 		pathname: INJECT_URL,
 		origin: INJECT_URL,
 		href,
+		set hash(hash) {
+			if (location.hash === hash) {
+				return;
+			}
+			const url = location.href.replace(location.origin, "");
+
+			history.pushState(null, "", url + hash);
+
+			window.dispatchEvent(new Event("popstate"));
+		},
+		get hash() {
+			return states[index].hash;
+		},
 	};
 	const states = [{
 		state: null,
 		href: location.href,
+		hash: "",
 	}];
 	let index = 0;
 	const history = {
@@ -64,17 +87,22 @@ export function injectBrowser(href = DEFAULT_HREF) {
 		pushState(state, title, url) {
 			location.href = location.origin + url;
 			++index;
+			const hashs = url.match(/#.+/g);
+
 			states.splice(index, states.length - index, {
 				state,
 				href: location.origin + url,
+				hash: hashs ? hashs[0] : "",
 			});
 		},
 		replaceState(state, title, url) {
 			location.href = location.origin + url;
+			const hashs = url.match(/#.+/g);
 
 			states[index] = {
 				state,
 				href: location.origin + url,
+				hash: hashs ? hashs[0] : "",
 			};
 		},
 	};
@@ -131,6 +159,7 @@ export function mockPersistModules({
 
 	return {
 		"./browser": mockedBrowser,
+		"./PersistHistory": mockedPersistHistory,
 		"./historyManager": HistoryManagerInjector({
 			"./browser": mockedBrowser,
 			"./storageManager": mockedStorageManager,
@@ -142,7 +171,7 @@ export function mockPersistModules({
 	};
 }
 
-export function injectPersistModules({
+export function mockPersistModulesWithBrowser({
 	href = DEFAULT_HREF,
 	sessionLimitCount = -1,
 } = {}) {
@@ -156,14 +185,20 @@ export function injectPersistModules({
 	});
 }
 
-export function injectPersistExports(options) {
+export function injectHashPersist(options) {
+	const mockBrowser = options["./browser"];
+
+	return HashPersistInjector({
+		"./Persist": injectPersist(options),
+		"./browser": mockBrowser,
+	});
+}
+export function injectPersist(options) {
 	const nextOptions = {...options};
 
 	delete nextOptions["./browser"];
+	delete nextOptions["./PersistHistory"];
 	return PersistInjector(nextOptions);
-}
-export function injectPersist(options) {
-	return injectPersistExports(options);
 }
 
 export function storageManagerForLimit(limit, limit2) {
@@ -189,7 +224,7 @@ export function injectPersistForLimit(depthsLimit, addedLimit) {
 	});
 
 
-	return injectPersistExports({
+	return injectPersist({
 		"./storageManager": storageManager,
 		"./historyManager": historyManager,
 	});

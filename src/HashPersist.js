@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-use-before-define */
+import {location} from "./browser";
 import {CONST_HASH} from "./consts";
 import Persist from "./Persist";
 

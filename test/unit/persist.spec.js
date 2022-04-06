@@ -5,7 +5,7 @@ import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, injectPersistModules, INJECT_URL, injectPersist, injectPersistExports, injectPersistForLimit, mockPersistModules, clearStorage} from "./TestHelper";
+import {wait, mockPersistModulesWithBrowser, INJECT_URL, injectPersist, injectPersistForLimit, mockPersistModules, clearStorage} from "./TestHelper";
 import {PersistQuotaExceededError} from "../../src";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
@@ -699,7 +699,7 @@ describe("Persist", () => {
 		[1, 2, 3, 4, 5].forEach(limit => {
 			it(`test depth test for exceed test (limit: ${limit})`, () => {
 				// Given
-				const mockModules = injectPersistModules({
+				const mockModules = mockPersistModulesWithBrowser({
 					sessionLimitCount: limit,
 				});
 				const mockHistory = mockModules["./browser"].history;
@@ -771,7 +771,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> c", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -823,7 +823,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> a(new)", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -848,7 +848,7 @@ describe("Persist", () => {
 			mockHistory.pushState({}, "", "/a");
 
 			// remove (a) information
-			injectPersist(injectPersistModules({
+			injectPersist(mockPersistModulesWithBrowser({
 				href: `${INJECT_URL}/a`,
 			}));
 
@@ -881,7 +881,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> start(back) -> a(forward)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -945,7 +945,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> start(back) -> a(new)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -984,7 +984,7 @@ describe("Persist", () => {
 		});
 		it("test depth with reloead start -> a -> b -> start -> start(reload)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -1028,7 +1028,7 @@ describe("Persist", () => {
 		});
 		it("test depth only get() with start -> a -> b -> start(back)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -1079,9 +1079,9 @@ describe("Persist", () => {
 		});
 		it("should check remove 'b' depth when replaceDepth for start -> a -> b -> c(replace)", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = injectPersistExports(mockModules);
+			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
 
 			InjectedPersist.clear();
