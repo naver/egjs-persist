@@ -338,7 +338,7 @@ export function clear() {
 	PersistHistory.hash = null;
 }
 
-export function useHashPersist() {
+export function registerHashPersist() {
 	if (PersistHistory.useHash) {
 		return;
 	}

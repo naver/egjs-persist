@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 import Persist from "../../src/Persist";
 import {injectHashPersist, mockPersistModulesWithBrowser, reloadPersist, wait} from "./TestHelper";
-import {HashPersist, useHashPersist} from "../../src";
+import {HashPersist, registerHashPersist} from "../../src";
 import PersistHistory from "../../src/PersistHistory";
 import {clear, getHashDepths} from "../../src/historyManager";
 
@@ -11,7 +11,7 @@ describe("HashPersist", () => {
 		location.hash = "";
 		clear();
 		sessionStorage.clear();
-		useHashPersist();
+		registerHashPersist();
 	});
 
 	afterEach(() => {
@@ -204,7 +204,7 @@ describe("HashPersist", () => {
 		const mockModules = mockPersistModulesWithBrowser();
 		const InjectedHashPersist = injectHashPersist(mockModules);
 
-		mockModules["./historyManager"].useHashPersist();
+		mockModules["./historyManager"].registerHashPersist();
 		const persist = new InjectedHashPersist();
 		const mockHistory = mockModules["./browser"].history;
 		const mockPersistHistory = mockModules["./PersistHistory"];
@@ -236,7 +236,7 @@ describe("HashPersist", () => {
 		const InjectedHashPersist = injectHashPersist(mockModules);
 		const mockHistoryManager = mockModules["./historyManager"];
 
-		mockHistoryManager.useHashPersist();
+		mockHistoryManager.registerHashPersist();
 		const persist = new InjectedHashPersist();
 		const mockHistory = mockModules["./browser"].history;
 		const mockLocation = mockModules["./browser"].location;
@@ -265,7 +265,7 @@ describe("HashPersist", () => {
 		const InjectedHashPersist = injectHashPersist(mockModules);
 		const mockHistoryManager = mockModules["./historyManager"];
 
-		mockHistoryManager.useHashPersist();
+		mockHistoryManager.registerHashPersist();
 		const persist = new InjectedHashPersist();
 		const mockHistory = mockModules["./browser"].history;
 		const mockLocation = mockModules["./browser"].location;
@@ -297,7 +297,7 @@ describe("HashPersist", () => {
 		const InjectedHashPersist = injectHashPersist(mockModules);
 		const mockHistoryManager = mockModules["./historyManager"];
 
-		mockHistoryManager.useHashPersist();
+		mockHistoryManager.registerHashPersist();
 		const persist = new InjectedHashPersist();
 		const mockHistory = mockModules["./browser"].history;
 		const mockPersistHistory = mockModules["./PersistHistory"];
@@ -331,7 +331,7 @@ describe("HashPersist", () => {
 		const InjectedHashPersist = injectHashPersist(mockModules);
 		const mockHistoryManager = mockModules["./historyManager"];
 
-		mockHistoryManager.useHashPersist();
+		mockHistoryManager.registerHashPersist();
 		const persist = new InjectedHashPersist();
 		const mockHistory = mockModules["./browser"].history;
 		const mockPersistHistory = mockModules["./PersistHistory"];

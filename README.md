@@ -78,6 +78,24 @@ try {
 }
 ```
 
+### Used in Hash
+Basic Persist supports only url excluding hash. If you want to use hash, use the code below.
+```js
+import { HashPersist, registerHashPersist } from "@egjs/persist";
+
+// Register globally to use HashPersist.
+registerHashPersist();
+
+
+// Use HashPersist
+const persist = new HashPersist();
+
+// set
+persist.set("a", "A");
+
+// get
+persist.get("a");
+```
 
 ### Used in SPA
 

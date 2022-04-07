@@ -6,7 +6,7 @@ import PersistQuotaExceededError from "./PersistQuotaExceededError";
 export {
 	updateDepth,
 	replaceDepth,
-	useHashPersist,
+	registerHashPersist,
 	releaseEvent,
 } from "./historyManager";
 
