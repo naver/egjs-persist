@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 import {window, console, history, location, sessionStorage, localStorage} from "./browser";
 import {CONST_DEPTHS, CONST_PERSIST, CONST_PERSIST_STATE} from "./consts";
 

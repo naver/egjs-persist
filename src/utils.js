@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 import {navigator, parseFloat, performance, location, console} from "./browser";
 import {CONST_PERSIST} from "./consts";
 

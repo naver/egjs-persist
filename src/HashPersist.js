@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-use-before-define */
 import {location} from "./browser";
@@ -16,7 +20,7 @@ import Persist from "./Persist";
 class HashPersist extends Persist {
 	/**
 	 * Read value
-	 * @param {String?} path target path
+	 * @param {String|Array} [path] - target path
 	 * @return {String|Number|Boolean|Object|Array}
 	 */
 	get(path) {
@@ -24,8 +28,8 @@ class HashPersist extends Persist {
 	}
 	/**
 	 * Save value
-	 * @param {String} path target path
-	 * @param {String|Number|Boolean|Object|Array} value value to save
+	 * @param {String|Array} path - target path
+	 * @param {String|Number|Boolean|Object|Array} value - value to save
 	 * @return {Persist}
 	 */
 	set(path, value) {
@@ -33,7 +37,7 @@ class HashPersist extends Persist {
 	}
 	/**
 	 * Remove value
-	 * @param {String} path target path
+	 * @param {String|Array} [path] - target path
 	 * @return {Persist}
 	 */
 	remove(path) {

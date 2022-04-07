@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-use-before-define */
 import {
@@ -57,7 +61,7 @@ class Persist {
 	}
 	/**
 	 * Save value
-	 * @param {String} path target path
+	 * @param {String|Array} [path] - target path
 	 * @param {String|Number|Boolean|Object|Array} value value to save
 	 * @return {Persist}
 	 */
@@ -66,7 +70,7 @@ class Persist {
 	}
 	/**
 	 * Remove value
-	 * @param {String} path target path
+	 * @param {String|Array} path - target path
 	 * @return {Persist}
 	 */
 	remove(path) {
