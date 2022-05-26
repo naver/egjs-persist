@@ -1,13 +1,12 @@
 /* eslint-disable no-new */
 /* eslint-disable no-unused-expressions */
-import UtilsInjector from "inject-loader!../../src/utils";
 import StorageManagerInjector from "inject-loader!../../src/storageManager";
 import Persist from "../../src/Persist";
 import * as utils from "../../src/utils";
 import * as StorageManager from "../../src/storageManager";
 import {CONST_PERSIST_STATE, CONST_DEPTHS, CONST_LAST_URL} from "../../src/consts";
-import {wait, storageManagerForLimit, injectBrowser, injectPersistModules, INJECT_URL, injectPersist, injectPersistExports, getDepths} from "./TestHelper";
-import { PersistQuotaExceededError } from "../../src";
+import {wait, mockPersistModulesWithBrowser, INJECT_URL, injectPersist, injectPersistForLimit, mockPersistModules, clearStorage} from "./TestHelper";
+import {PersistQuotaExceededError} from "../../src";
 
 const StorageManagerUsingHistory = StorageManagerInjector(
 	{
@@ -25,17 +24,6 @@ const StorageManagerUsingHistory = StorageManagerInjector(
 const PersistUsingHistory = injectPersist({
 	"./storageManager": StorageManagerUsingHistory,
 });
-
-const mockBrowser = injectBrowser();
-const mockState = {
-	"./storageManager": StorageManagerInjector({
-		"./browser": mockBrowser,
-	}),
-	"./utils": UtilsInjector({
-		"./browser": mockBrowser,
-	}),
-};
-
 
 describe("Persist", () => {
 	describe("isNeeded", () => {
@@ -484,23 +472,18 @@ describe("Persist", () => {
 			it("cannot setting key value on array with warning", () => {
 				// Given
 				let warnCalled = false;
-				const MockedPersist = injectPersist(
-					{
-						"./browser": {
+				const MockedPersist = injectPersist(mockPersistModules({
+					browser: {
 
-							console: {
-								...console,
-								warn: () => {
-									warnCalled = true;
-								},
-							},
-							window: {
-
+						console: {
+							...console,
+							warn: () => {
+								warnCalled = true;
 							},
 						},
-
-					}
-				);
+						window: {},
+					},
+				}));
 
 				const persist = new MockedPersist("TESTKEY");
 
@@ -620,15 +603,8 @@ describe("Persist", () => {
 		it(`test depth test for exceed test (depths limit: 0)`, () => {
 			try {
 				// Given
-				const persist = new(injectPersist(
-					{
-						"./storageManager": storageManagerForLimit(0),
-						"./browser": {
-							window: {},
-							console: window,
-						},
-					}
-				))("");
+				const InjectedPersist = injectPersistForLimit(0);
+				const persist = new InjectedPersist("");
 
 				// When
 				persist.set("a", "");
@@ -643,15 +619,8 @@ describe("Persist", () => {
 		it(`should check if other values of sessionStorage are displayed`, () => {
 			try {
 				// Given
-				const persist = new(injectPersist(
-					{
-						"./storageManager": storageManagerForLimit(0),
-						"./browser": {
-							window: {},
-							console: window,
-						},
-					}
-				))("");
+				const InjectedPersist = injectPersistForLimit(0);
+				const persist = new InjectedPersist("");
 
 				sessionStorage.setItem("test1", "22");
 				sessionStorage.setItem("test2", "1114");
@@ -676,15 +645,8 @@ describe("Persist", () => {
 		[2, 3, 4, 5].forEach(limit => {
 			it(`test depth test for exceed test (depths limit: ${limit}, value limit: ${limit - 1})`, () => {
 				// Given
-				const persist = new(injectPersist(
-					{
-						"./storageManager": storageManagerForLimit(limit, limit - 1),
-						"./browser": {
-							window: {},
-							console,
-						},
-					}
-				))("");
+				const InjectedPersist = injectPersistForLimit(limit, limit - 1);
+				const persist = new InjectedPersist("");
 
 
 				if (limit < 3) {
@@ -693,7 +655,7 @@ describe("Persist", () => {
 					persist.set("a", "1");
 
 					// Then
-					const state1 = getDepths().length;
+					const state1 = StorageManager.getDepths().length;
 
 					expect(state1).to.be.equals(limit - 1);
 
@@ -702,7 +664,7 @@ describe("Persist", () => {
 					persist.set("a", "1");
 
 					// Then
-					const state2 = getDepths().length;
+					const state2 = StorageManager.getDepths().length;
 
 					expect(state2).to.be.equals(limit - 1);
 				} else {
@@ -716,7 +678,7 @@ describe("Persist", () => {
 						// start, a0
 						// start, a0 , a1
 						// a0 , a1, a2
-						const state = getDepths().length;
+						const state = StorageManager.getDepths().length;
 
 						expect(state).to.be.equals(j + 2);
 					}
@@ -728,7 +690,7 @@ describe("Persist", () => {
 					persist.set("a", 1);
 
 					// Then
-					const currentState = getDepths().length;
+					const currentState = StorageManager.getDepths().length;
 
 					expect(currentState).to.be.equals(limit - 1);
 				}
@@ -737,7 +699,7 @@ describe("Persist", () => {
 		[1, 2, 3, 4, 5].forEach(limit => {
 			it(`test depth test for exceed test (limit: ${limit})`, () => {
 				// Given
-				const mockModules = injectPersistModules({
+				const mockModules = mockPersistModulesWithBrowser({
 					sessionLimitCount: limit,
 				});
 				const mockHistory = mockModules["./browser"].history;
@@ -804,11 +766,12 @@ describe("Persist", () => {
 			Persist.clear();
 		});
 		afterEach(() => {
+			clearStorage();
 			history.replaceState({}, "", pathname);
 		});
 		it("test depth start -> a -> b -> c", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -860,7 +823,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> a(new)", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -885,7 +848,7 @@ describe("Persist", () => {
 			mockHistory.pushState({}, "", "/a");
 
 			// remove (a) information
-			injectPersist(injectPersistModules({
+			injectPersist(mockPersistModulesWithBrowser({
 				href: `${INJECT_URL}/a`,
 			}));
 
@@ -918,7 +881,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> start(back) -> a(forward)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -982,7 +945,7 @@ describe("Persist", () => {
 		});
 		it("test depth start -> a -> b -> start(back) -> a(new)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -1021,7 +984,7 @@ describe("Persist", () => {
 		});
 		it("test depth with reloead start -> a -> b -> start -> start(reload)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -1048,14 +1011,11 @@ describe("Persist", () => {
 
 			// start(reload)
 			// remove start information
-			injectPersist(
-				{
-					"./utils": {
-						...utils,
-						getNavigationType: () => 1,
-					},
-				}
-			);
+			injectPersist(mockPersistModules({
+				utils: {
+					getNavigationType: () => 1,
+				},
+			}));
 			const value2 = persist.get("value");
 			const length2 = StorageManager.getStateByKey(CONST_PERSIST_STATE, CONST_DEPTHS).length;
 
@@ -1068,7 +1028,7 @@ describe("Persist", () => {
 		});
 		it("test depth only get() with start -> a -> b -> start(back)", async () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
 			const InjectedPersist = injectPersist(mockModules);
 			const persist = new InjectedPersist("");
@@ -1119,12 +1079,12 @@ describe("Persist", () => {
 		});
 		it("should check remove 'b' depth when replaceDepth for start -> a -> b -> c(replace)", () => {
 			// Given
-			const mockModules = injectPersistModules();
+			const mockModules = mockPersistModulesWithBrowser();
 			const mockHistory = mockModules["./browser"].history;
-			const InjectedPersist = injectPersistExports(mockModules);
-			const persist = new InjectedPersist.default("");
+			const InjectedPersist = injectPersist(mockModules);
+			const persist = new InjectedPersist("");
 
-			InjectedPersist.default.clear();
+			InjectedPersist.clear();
 
 			// When
 			// start
@@ -1143,7 +1103,7 @@ describe("Persist", () => {
 			// c (replace)
 			mockHistory.replaceState({}, "", "/c");
 
-			InjectedPersist.replaceDepth();
+			mockModules["./historyManager"].replaceDepth();
 
 
 			// start -> a(x) -> c

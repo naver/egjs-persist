@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
 const win = (typeof window !== `undefined` && window) || {};
 
 export {win as window};

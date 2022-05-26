@@ -1,5 +1,9 @@
-import {window, history, location, sessionStorage, localStorage} from "./browser";
-import {CONST_PERSIST} from "./consts";
+/*
+ * Copyright (c) 2015 NAVER Corp.
+ * egjs projects are licensed under the MIT license
+ */
+import {window, console, history, location, sessionStorage, localStorage} from "./browser";
+import {CONST_DEPTHS, CONST_PERSIST, CONST_PERSIST_STATE} from "./consts";
 
 const isSupportState = history && "replaceState" in history && "state" in history;
 let storageType = "None";
@@ -48,7 +52,7 @@ function warnInvalidStorageValue() {
 /*
  * Get state value
  */
-function getState(key) {
+export function getState(key) {
 	let state;
 
 	let stateStr;
@@ -95,7 +99,7 @@ function getState(key) {
 /*
  * Set state value
  */
-function setState(key, state) {
+export function setState(key, state) {
 	if (storage) {
 		if (state) {
 			storage.setItem(
@@ -168,4 +172,12 @@ export function setStateByKey(key, valueKey, data) {
  */
 export function reset(key) {
 	setState(key, null);
+}
+
+export function getPersistState(key) {
+	return getStateByKey(CONST_PERSIST_STATE, key);
+}
+
+export function getDepths() {
+	return getPersistState(CONST_DEPTHS) || [];
 }

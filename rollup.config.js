@@ -18,7 +18,7 @@ export default [
 		],
 	}),
 	esm({
-		input: "./src/Persist.js",
+		input: "./src/index.js",
 		output: "./dist/persist.esm.js",
 	}),
 ];

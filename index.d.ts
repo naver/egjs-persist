@@ -30,12 +30,16 @@ declare module "@egjs/persist" {
 		public remove(path: string): this;
 	}
 
+	export class HashPersist extends Persist {
+	}
+
 	export class PersistQuotaExceededError extends Error {
 		public name: string;
 		public storageType: "SessionStorage" | "LocalStorage" | "History" | "None";
 		public key: string;
 		public size: number;
 	}
+	export function releaseEvent(): void;
 	export function updateDepth(type?: number): void;
 	export function replaceDepth(): void;
 	export default Persist;

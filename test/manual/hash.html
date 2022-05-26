@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+<title>Persist - Hash</title>
+<meta http-equiv="x-ua-compatible" content="ie=edge"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+<script src="../../dist/persist.js"></script>
+</head>
+<body>
+	<a href="#a">#a</a>
+	<a href="#b">#b</a>
+	<button id="a1">Set Persist</button>
+	<button id="a2">Set Persist</button>
+
+	<button id="a3">Set2 Persist</button>
+	<button id="a4">Set2 Persist</button>
+</body>
+<script>
+	eg.Persist.registerHashPersist();
+	document.querySelector("#a1").addEventListener("click", () => {
+		const p = new eg.Persist();
+
+		p.set("A", "?");
+	});
+	document.querySelector("#a2").addEventListener("click", () => {
+		const p = new eg.Persist("key2");
+
+		p.set("A", "?");
+		
+	});
+	document.querySelector("#a3").addEventListener("click", () => {
+		const p = new eg.Persist.HashPersist();
+
+		console.log(p.get("A"));
+		p.set("A", "?");
+		
+	});
+	document.querySelector("#a4").addEventListener("click", () => {
+		const p = new eg.Persist.HashPersist("key2");
+
+		console.log(p.get("A"));
+		p.set("A", "?");
+		
+	});
+</script>
+</html>
